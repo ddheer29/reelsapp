@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">dheer_app</string>
+    <string name="app_name">Dheer</string>
+     <!-- Facebook Config Here -->
+    <string name="facebook_app_id">886038026814920</string>
+    <string name="fb_login_protocol_scheme">fb886038026814920</string>
+    <string name="facebook_client_token">a1500c2681c6396395be6bbd30eb84ee</string>
+      <!-- Facebook Config Here -->
 </resources>

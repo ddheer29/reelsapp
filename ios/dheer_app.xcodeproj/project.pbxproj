@@ -12,9 +12,16 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		410E13E5B1AA406F9240C73C /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4A03F2DE3AF94BCB899D135B /* Poppins-SemiBold.ttf */; };
+		416F8CECC70647769B780E07 /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78639173923248938AA475D0 /* Poppins-Black.ttf */; };
 		684BD48E890372877ACAC5CD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 98D773F5A0BB6092B6DF900F /* PrivacyInfo.xcprivacy */; };
+		6F23AEFE7D8F48BF9F6229C1 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8D755B2576EE4B9DB89DB52D /* Poppins-Bold.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-dheer_app-dheer_appTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-dheer_app-dheer_appTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		987F61CC79B84658B338A990 /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B36C3FAB0F1414AB9B3E7E9 /* Poppins-Medium.ttf */; };
+		9FCF98384308454D8B49F969 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A97177A07154CA7A5FC5032 /* Poppins-Light.ttf */; };
+		C59C0B2316A048588F239C50 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 36FB78BCE733428F9E297642 /* Poppins-Regular.ttf */; };
+		FAE487A4DC2D4F929743CBC8 /* Audiowide-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 152DB6125F5F4903B69F0835 /* Audiowide-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,13 +45,20 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = dheer_app/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = dheer_app/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = dheer_app/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		152DB6125F5F4903B69F0835 /* Audiowide-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Audiowide-Regular.ttf"; path = "../src/assets/fonts/Audiowide-Regular.ttf"; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-dheer_app-dheer_appTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dheer_app-dheer_appTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		36FB78BCE733428F9E297642 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../src/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-dheer_app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dheer_app.debug.xcconfig"; path = "Target Support Files/Pods-dheer_app/Pods-dheer_app.debug.xcconfig"; sourceTree = "<group>"; };
+		4A03F2DE3AF94BCB899D135B /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-dheer_app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dheer_app.release.xcconfig"; path = "Target Support Files/Pods-dheer_app/Pods-dheer_app.release.xcconfig"; sourceTree = "<group>"; };
+		5A97177A07154CA7A5FC5032 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-dheer_app-dheer_appTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dheer_app-dheer_appTests.debug.xcconfig"; path = "Target Support Files/Pods-dheer_app-dheer_appTests/Pods-dheer_app-dheer_appTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-dheer_app.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dheer_app.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		78639173923248938AA475D0 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../src/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
+		7B36C3FAB0F1414AB9B3E7E9 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = dheer_app/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-dheer_app-dheer_appTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dheer_app-dheer_appTests.release.xcconfig"; path = "Target Support Files/Pods-dheer_app-dheer_appTests/Pods-dheer_app-dheer_appTests.release.xcconfig"; sourceTree = "<group>"; };
+		8D755B2576EE4B9DB89DB52D /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../src/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		98D773F5A0BB6092B6DF900F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = dheer_app/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -127,6 +141,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				B33C23D5EC6D4D4081976A1B /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -140,6 +155,21 @@
 				00E356EE1AD99517003FC87E /* dheer_appTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B33C23D5EC6D4D4081976A1B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				152DB6125F5F4903B69F0835 /* Audiowide-Regular.ttf */,
+				78639173923248938AA475D0 /* Poppins-Black.ttf */,
+				8D755B2576EE4B9DB89DB52D /* Poppins-Bold.ttf */,
+				5A97177A07154CA7A5FC5032 /* Poppins-Light.ttf */,
+				7B36C3FAB0F1414AB9B3E7E9 /* Poppins-Medium.ttf */,
+				36FB78BCE733428F9E297642 /* Poppins-Regular.ttf */,
+				4A03F2DE3AF94BCB899D135B /* Poppins-SemiBold.ttf */,
+			);
+			name = Resources;
+			path = "";
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -249,6 +279,13 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				684BD48E890372877ACAC5CD /* PrivacyInfo.xcprivacy in Resources */,
+				FAE487A4DC2D4F929743CBC8 /* Audiowide-Regular.ttf in Resources */,
+				416F8CECC70647769B780E07 /* Poppins-Black.ttf in Resources */,
+				6F23AEFE7D8F48BF9F6229C1 /* Poppins-Bold.ttf in Resources */,
+				9FCF98384308454D8B49F969 /* Poppins-Light.ttf in Resources */,
+				987F61CC79B84658B338A990 /* Poppins-Medium.ttf in Resources */,
+				C59C0B2316A048588F239C50 /* Poppins-Regular.ttf in Resources */,
+				410E13E5B1AA406F9240C73C /* Poppins-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
