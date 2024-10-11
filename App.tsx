@@ -1,19 +1,35 @@
 import 'react-native-gesture-handler';
-import { StyleSheet } from 'react-native';
+import {Platform, StatusBar, StyleSheet} from 'react-native';
 import React from 'react';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Navigation from './src/navigation/Navigation';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Provider} from 'react-redux';
+import {persistor, store} from './src/redux/store';
+import {PersistGate} from 'redux-persist/integration/react';
 
 GoogleSignin.configure({
-  webClientId: '118252792281-s50l7e855pa3oheb04kefeqeeeq4bnrc.apps.googleusercontent.com',
+  webClientId:
+    '118252792281-s50l7e855pa3oheb04kefeqeeeq4bnrc.apps.googleusercontent.com',
   forceCodeForRefreshToken: true,
   offlineAccess: false,
-  iosClientId: '118252792281-7pomlrv6fu71bsfrcjlrdh1uvlkb66g0.apps.googleusercontent.com',
+  iosClientId:
+    '118252792281-7pomlrv6fu71bsfrcjlrdh1uvlkb66g0.apps.googleusercontent.com',
 });
 
 const App = () => {
   return (
-    <Navigation />
+    <GestureHandlerRootView style={{flex: 1}}>
+      <StatusBar
+        translucent={Platform.OS === 'ios'}
+        backgroundColor="transparent"
+      />
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <Navigation />
+        </PersistGate>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 
