@@ -1,4 +1,4 @@
-import {configureStore} from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import {
   FLUSH,
   REHYDRATE,
@@ -16,7 +16,7 @@ const persistConfig = {
   key: 'root',
   storage: reduxStorage,
   blacklist: [],
-  whitelist: ['user'],
+  whitelist: ['user'], // data will be stored in the store (name of reducers used in root reducer)
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

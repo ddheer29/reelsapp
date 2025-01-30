@@ -29,13 +29,15 @@ const SplashScreen: FC = () => {
       const decodedRefreshToken = jwtDecode<DecodedToken>(refresh_token);
 
       const currentTime = Date.now() / 1000;
-      if (decodedRefreshToken.exp < currentTime) {
+      if (decodedRefreshToken?.exp < currentTime) {
+        // if refresh roken is expired then we cant refresh access token, go back to login screen and login again
         resetAndNavigate('LoginScreen');
         Alert.alert('Session Expired, please login again');
         return;
       }
 
-      if (decodedAccessToken.exp < currentTime) {
+      if (decodedAccessToken?.exp < currentTime) {
+        // if access roken is expired then here we r refreshing it
         try {
           refresh_tokens();
           dispatch(refetchUser());
@@ -45,9 +47,12 @@ const SplashScreen: FC = () => {
           return;
         }
       }
+
+      // if none of the token is expired and everthing is fine then we navigate to bottom tab
       resetAndNavigate('BottomTab');
       return;
     }
+    // if no access token found then we navigate to login screen
     resetAndNavigate('LoginScreen');
   }
 
@@ -100,7 +105,7 @@ const SplashScreen: FC = () => {
           variant="h3"
         // fontFamily={FONTS.Reelz}
         >
-          Reelzzz @Divyang
+          Reelzzz
         </CustomText>
       </View>
     </View>

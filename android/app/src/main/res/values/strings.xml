@@ -4,5 +4,6 @@
     <string name="facebook_app_id">886038026814920</string>
     <string name="fb_login_protocol_scheme">fb886038026814920</string>
     <string name="facebook_client_token">a1500c2681c6396395be6bbd30eb84ee</string>
+    <string name="default_web_client_id">118252792281-up2ums7uokok9cs6k5kvpel5r27c08m7.apps.googleusercontent.com</string>
       <!-- Facebook Config Here -->
 </resources>

@@ -8,18 +8,20 @@ export const appAxios = axios.create({
   baseURL: BASE_URL,
 });
 
-appAxios.interceptors.request.use(async config => {
-  const access_token = token_storage.getString('access_token');
-  if (access_token) {
-    config.headers.Authorization = `Bearer ${access_token}`;
+appAxios.interceptors.request.use(
+  async config => {
+    const access_token = token_storage.getString('access_token');
+    if (access_token) {
+      config.headers.Authorization = `Bearer ${access_token}`;
+    }
+    return config;
   }
-  return config;
-}
 );
 
-axios.interceptors.response.use(
+appAxios.interceptors.response.use(
   response => response,
   async error => {
+    // if token is expired, then we will automatically refresh the token
     if (error.response && error.response.status === 401) {
       try {
         const newAccessToken = await refresh_tokens();
@@ -32,7 +34,7 @@ axios.interceptors.response.use(
       }
     }
 
-    if (error.response && error.response.status !== 401) {
+    if (error.response && error.response.status != 401) {
       const errorMessage = error.response.data.msg || 'something went wrong';
       Alert.alert(errorMessage);
     }
