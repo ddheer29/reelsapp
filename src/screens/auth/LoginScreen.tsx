@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Google from '../../assets/icons/google.png';
 import { useAppDispatch } from '../../redux/reduxHook';
 import { signInWithFacebook, signInWithGoogle } from '../../redux/SocialLogin';
+import { resetAndNavigate } from '../../utils/NavigationUtil';
 
 const LoginScreen = () => {
 
@@ -47,7 +48,7 @@ const LoginScreen = () => {
 
       <SocialButtonHorizontal
         icon={<Icon name="facebook" size={20} color={Colors.text} />}
-        onPress={async () => await dispatch(signInWithFacebook())}
+        onPress={() => resetAndNavigate('BottomTab')}
         text="Continue with Facebook"
         textColor="#fff"
         backgroundColor={Colors.fbColor}
