@@ -7,6 +7,7 @@ import { Colors } from '../../constants/Colors';
 import CustomText from '../global/CustomText';
 import { launchCamera } from 'react-native-image-picker';
 import { createThumbnail } from 'react-native-create-thumbnail';
+import { navigate } from '../../utils/NavigationUtil';
 
 const PickerReelButton: FC = () => {
 
@@ -26,6 +27,10 @@ const PickerReelButton: FC = () => {
           .then((response) => {
             if (res.assets![0].uri) {
               // upload reel
+              navigate('UploadReelScreen', {
+                thumb_uri: response.path,
+                file_uri: res.assets![0].uri
+              })
             }
           })
           .catch((err) => {
