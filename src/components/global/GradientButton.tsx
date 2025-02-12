@@ -3,7 +3,7 @@ import React from 'react';
 import { Colors } from '../../constants/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomText from './CustomText';
-import { Icon } from 'react-native-vector-icons/Icon';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FONTS } from '../../constants/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 
