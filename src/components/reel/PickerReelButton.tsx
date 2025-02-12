@@ -26,7 +26,6 @@ const PickerReelButton: FC = () => {
         })
           .then((response) => {
             if (res.assets![0].uri) {
-              // upload reel
               navigate('UploadReelScreen', {
                 thumb_uri: response.path,
                 file_uri: res.assets![0].uri

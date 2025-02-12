@@ -10,6 +10,9 @@ import { Colors } from '../../constants/Colors'
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { screenHeight } from '../../utils/Scaling'
 import { FONTS } from '../../constants/Fonts'
+import { convertDurationToMMSS } from '../../utils/dateUtils'
+import { createThumbnail } from 'react-native-create-thumbnail'
+import { navigate } from '../../utils/NavigationUtil'
 
 interface VideoProp {
   uri: string;
@@ -121,15 +124,46 @@ const PickReelScreen: FC = () => {
     isLoadingNextPage,
     hasNextPage
   } = useGallery({ pageSize: 30 });
-  console.log("🚀 ~ videos:", videos)
 
   const handleOpenSettings = () => {
     Linking.openSettings();
   }
 
+  const handleVideoSelect = async (data: any) => {
+    const { uri } = data;
+    if (Platform.OS === 'android') {
+      createThumbnail({
+        url: uri || '',
+        timeStamp: 100,
+      }).then((response) => {
+        console.log(response);
+        navigate('UploadReelScreen', {
+          thumb_uri: response.path,
+          file_uri: uri
+        })
+      }).catch((err) => {
+        console.log("🚀 ~ .Error while generating thumbnail ~ err:", err)
+      })
+      return;
+    }
+    const fileData = await CameraRoll.iosGetImageDataById(uri);
+    createThumbnail({
+      url: fileData?.node?.image?.filepath || '',
+      timeStamp: 100,
+    }).then((response) => {
+      console.log(response);
+      navigate('UploadReelScreen', {
+        thumb_uri: response.path,
+        file_uri: uri
+      })
+    }).catch((err) => {
+      console.log("🚀 ~ .Error while generating thumbnail ~ err:", err)
+    })
+  }
+
   const renderItem = ({ item }: { item: VideoProp }) => {
     return (
-      <TouchableOpacity style={styles.videoItem} onPress={() => { }}>
+      <TouchableOpacity style={styles.videoItem} onPress={() => handleVideoSelect(item)}>
         <Image
           source={{ uri: item.uri }}
           style={styles.thumbnail}
@@ -139,7 +173,7 @@ const PickReelScreen: FC = () => {
           style={styles.time}
           fontFamily={FONTS.SemiBold}
         >
-          {item?.playableDuration}
+          {convertDurationToMMSS(item?.playableDuration)}
         </CustomText>
       </TouchableOpacity>
     )
