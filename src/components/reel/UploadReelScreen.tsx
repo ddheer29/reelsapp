@@ -6,6 +6,7 @@ import { useRoute } from '@react-navigation/native';
 import { Colors } from '../../constants/Colors';
 import GradientButton from '../global/GradientButton';
 import { goBack } from '../../utils/NavigationUtil';
+import { useUpload } from '../uploadservice/UploadContext';
 
 interface uriData {
   thumb_uri: string;
@@ -17,6 +18,8 @@ const UploadReelScreen: FC = () => {
   const item = data.params as uriData;
   console.log("🚀 ~ item:", item)
   const [caption, setCaption] = useState<string>('');
+
+  const { startUpload } = useUpload();
 
   return (
     <CustomSafeAreaView>
@@ -41,7 +44,10 @@ const UploadReelScreen: FC = () => {
         <GradientButton
           text='Upload'
           iconName='upload'
-          onPress={() => goBack()}
+          onPress={() => {
+            goBack();
+            startUpload(item.thumb_uri, item.file_uri, caption);
+          }}
         />
       </ScrollView>
     </CustomSafeAreaView>
