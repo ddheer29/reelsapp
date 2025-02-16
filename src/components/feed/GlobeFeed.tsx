@@ -1,15 +1,31 @@
 import { ImageBackground, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import GlobeBg from '../../assets/images/globebg.jpg';
 import { screenHeight, screenWidth } from '../../utils/Scaling';
+import { useAppDispatch } from '../../redux/reduxHook';
+import { fetchFeedReel } from '../../redux/actions/reelAction';
 
 const GlobeFeed = () => {
+  const dispatch = useAppDispatch();
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true);
 
-  const [data, setata] = useState([])
+  const fetchFeed = async () => {
+    setLoading(true);
+    const data = await dispatch(fetchFeedReel(0, 16));
+    setData(data);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchFeed();
+  }, [])
 
   return (
     <ImageBackground source={GlobeBg} style={{ flex: 1, zIndex: -1 }}>
-      <Text>GlobeFeed</Text>
+      <View style={styles.gridContainer}>
+
+      </View>
     </ImageBackground>
   )
 }
