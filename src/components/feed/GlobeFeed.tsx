@@ -7,6 +7,7 @@ import { fetchFeedReel } from '../../redux/actions/reelAction';
 import ReelItemCard from './ReelItemCard';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import StatsContainer from './StatsContainer';
 
 function clamp(val: any, min: any, max: any) {
   return Math.min(Math.max(val, min), max);
@@ -96,6 +97,7 @@ const GlobeFeed = () => {
           imageStyle={{ resizeMode: 'cover' }}
         >
           <Animated.View style={[styles.container, animatedStyle]}>
+            <StatsContainer />
             <View style={styles.gridContainer}>
               {
                 loading ? (
