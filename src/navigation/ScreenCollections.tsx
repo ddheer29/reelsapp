@@ -1,10 +1,11 @@
-import UploadReelScreen from '../components/reel/UploadReelScreen';
+import UploadReelScreen from '../screens/reel/UploadReelScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import SplashScreen from '../screens/auth/SplashScreen';
 import HomeScreen from '../screens/dashboard/HomeScreen';
 import PickReelScreen from '../screens/reel/PickReelScreen';
 import BottomTab from './BottomTab';
+import FeedReelScrollScreen from '../screens/reel/FeedReelScrollScreen';
 
 export const authStack = [
   {
@@ -34,6 +35,10 @@ export const dashboardStack = [
     name: 'UploadReelScreen',
     component: UploadReelScreen,
   },
+  {
+    name: 'FeedReelScrollScreen',
+    component: FeedReelScrollScreen
+  }
 ];
 
 export const mergedStacks = [...dashboardStack, ...authStack];

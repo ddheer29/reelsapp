@@ -1,12 +1,12 @@
 import { Image, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { FC, useState } from 'react'
-import CustomSafeAreaView from '../global/CustomSafeAreaView'
-import CustomHeader from '../global/CustomHeader';
+import CustomSafeAreaView from '../../components/global/CustomSafeAreaView'
+import CustomHeader from '../../components/global/CustomHeader';
 import { useRoute } from '@react-navigation/native';
 import { Colors } from '../../constants/Colors';
-import GradientButton from '../global/GradientButton';
+import GradientButton from '../../components/global/GradientButton';
 import { goBack } from '../../utils/NavigationUtil';
-import { useUpload } from '../uploadservice/UploadContext';
+import { useUpload } from '../../components/uploadservice/UploadContext';
 
 interface uriData {
   thumb_uri: string;
