@@ -8,6 +8,7 @@ import ReelItemCard from './ReelItemCard';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import StatsContainer from './StatsContainer';
+import { navigate } from '../../utils/NavigationUtil';
 
 function clamp(val: any, min: any, max: any) {
   return Math.min(Math.max(val, min), max);
@@ -71,6 +72,12 @@ const GlobeFeed = () => {
     setLoading(false);
   }
 
+  async function moveToFirst(arr: any[], index: number) {
+    const first = arr.splice(index, 1);
+    await arr.unshift(first[0]);
+    return arr;
+  }
+
   const renderItem = ({ item, index }: { item: any, index: number }) => {
     const verticalShift = index % 2 === 0 ? -20 : 20;
     return (
@@ -78,7 +85,14 @@ const GlobeFeed = () => {
         <ReelItemCard
           item={item}
           loading={loading}
-          onPressReel={async () => { }}
+          onPressReel={async () => {
+            const copyArray = Array.from(data);
+            const result = await moveToFirst(copyArray, index);
+            navigate('FeedReelScrollScreen', {
+              data: result,
+              index: 0,
+            })
+          }}
         />
       </Animated.View>
     )
