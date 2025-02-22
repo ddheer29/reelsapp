@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
 import LottieView from 'lottie-react-native';
 import DoubleTapAnim from '../../assets/animations/heart.json';
+import ReelItem from './ReelItem';
 
 interface VideoItemProps {
   item: any;
@@ -79,7 +80,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
   return (
     <View style={styles.container}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GestureDetector gesture={Gesture.Simultaneous(singleTap, doubleTap)}>
+        <GestureDetector gesture={Gesture.Exclusive(doubleTap)}>
           <View style={styles.videoContainer}>
             {
               !videoLoaded && (
@@ -151,6 +152,18 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
           </View>
         )
       }
+
+      <ReelItem
+        user={item?.user}
+        description={item?.caption}
+        likes={22}
+        comments={29}
+        onLike={() => { }}
+        onComment={() => { }}
+        onShare={() => { }}
+        onLongPressLike={() => { }}
+        isLiked={true}
+      />
     </View>
   )
 }
