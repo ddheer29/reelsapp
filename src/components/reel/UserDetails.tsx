@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { FC } from 'react'
 import FastImage from 'react-native-fast-image';
-import { useAppDispatch } from '../../redux/reduxHook';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHook';
 import { selectUser } from '../../redux/reducers/userSlice';
 import { Colors } from '../../constants/Colors';
 import CustomText from '../global/CustomText';
@@ -13,7 +13,7 @@ interface UserDetailsProps {
 
 const UserDetails: FC<UserDetailsProps> = ({ user }) => {
 
-  const loggedInUser = useAppDispatch(selectUser)
+  const loggedInUser = useAppSelector(selectUser)
   const isFollowing = true;
 
   return (

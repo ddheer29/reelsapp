@@ -5,6 +5,7 @@ import { CHECK_USERNAME, REGISTER } from '../API';
 import { Alert } from 'react-native';
 import { token_storage } from '../storage';
 import { navigate } from '../../utils/NavigationUtil';
+import { addFollowing } from '../reducers/followingSlice';
 
 interface registerData {
   id_token: string;
@@ -21,7 +22,7 @@ export const refetchUser = () => async (dispatch: any) => {
     const res = await appAxios.get('/user/profile');
     await dispatch(setUser(res.data.user));
   } catch (error) {
-    console.log('REFETCH USER--> ', error);
+    console.log('REFETCH USER', error);
   }
 };
 
@@ -55,3 +56,16 @@ export const checkUserNameAvailability
     }
   };
 
+export const toggleFollow = (userId: string) => async (dispatch: any) => {
+  try {
+    const res = await appAxios.get(`/user/follow/${userId}`);
+    const data = {
+      id: userId,
+      isFollowing: res.data.msg == "Unfollowed" ? false : true,
+    }
+    dispatch(addFollowing(data));
+    dispatch(refetchUser());
+  } catch (error) {
+    console.log('TOGGLE FOLLOW ERROR:', error);
+  }
+};
