@@ -80,18 +80,11 @@ const FeedReelScrollScreen: FC = () => {
 
   const renderVideoList = useCallback(({ item, index }: { item: any, index: number }) => {
     return (
-      <View style={{ backgroundColor: 'red', flex: 1, height: screenHeight }}>
-        <Image
-          source={{ uri: item?.thumbUri }}
-          style={{
-            width: '100%',
-            height: screenHeight,
-            aspectRatio: 9 / 16,
-            resizeMode: 'cover'
-          }}
-        />
-        <VideoItem />
-      </View>
+      <VideoItem
+        item={item}
+        isVisible={index === currentVisibleIndex}
+        preload={Math.abs(currentVisibleIndex + 5) >= index}
+      />
     )
   }, [currentVisibleIndex]);
 
