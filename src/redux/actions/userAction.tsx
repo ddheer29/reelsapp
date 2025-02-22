@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { appAxios } from '../apiConfig';
 import { setUser } from '../reducers/userSlice';
-import { CHECK_USERNAME } from '../API';
+import { CHECK_USERNAME, REGISTER } from '../API';
 import { Alert } from 'react-native';
-import { REGISTER } from 'redux-persist';
 import { token_storage } from '../storage';
 import { navigate } from '../../utils/NavigationUtil';
 

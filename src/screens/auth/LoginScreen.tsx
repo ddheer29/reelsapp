@@ -48,7 +48,7 @@ const LoginScreen = () => {
 
       <SocialButtonHorizontal
         icon={<Icon name="facebook" size={20} color={Colors.text} />}
-        onPress={() => resetAndNavigate('BottomTab')}
+        onPress={async () => await dispatch(signInWithFacebook())}
         text="Continue with Facebook"
         textColor="#fff"
         backgroundColor={Colors.fbColor}

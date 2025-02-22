@@ -45,13 +45,12 @@ export const signInWithGoogle = () => async (dispatch: any) => {
     await GoogleSignin.hasPlayServices();
     await GoogleSignin.signOut();
     const { idToken, user } = await GoogleSignin.signIn();
-    try {
-      const res = await axios.post(LOGIN, {
-        provider: 'google',
-        id_token: idToken,
-      });
+    await axios.post(LOGIN, {
+      provider: 'google',
+      id_token: idToken,
+    }).then(async (res) => {
       await handleSignInSuccess(res, dispatch);
-    } catch (err: any) {
+    }).catch((err: any) => {
       const errorData = {
         email: user.email,
         name: user.name,
@@ -60,7 +59,7 @@ export const signInWithGoogle = () => async (dispatch: any) => {
         id_token: idToken,
       };
       handleSignInError(err, errorData as RegisterData);
-    }
+    })
   } catch (error) {
     console.log('GOOGLE ERROR: ', error);
   }

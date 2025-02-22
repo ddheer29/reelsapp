@@ -1,4 +1,4 @@
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Alert, PermissionsAndroid, requireNativeComponent } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Alert, PermissionsAndroid, requireNativeComponent, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Colors } from '../../constants/Colors';
 import { FONTS } from '../../constants/Fonts';
@@ -8,10 +8,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import CustomText from '../../components/global/CustomText';
 import { useRoute } from '@react-navigation/native';
 import { useAppDispatch } from '../../redux/reduxHook';
-import { checkUserNameAvailability } from '../../redux/actions/userAction';
+import { checkUserNameAvailability, register } from '../../redux/actions/userAction';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { s } from 'react-native-size-matters';
+import GradientButton from '../../components/global/GradientButton';
+import { uploadFile } from '../../redux/actions/fileAction';
 
 interface initialData {
   id_token: string;
@@ -62,7 +65,7 @@ const RegisterScreen = () => {
     ]);
   };
 
-  const handleLaunchCamera = async () => {
+  const handleLaunchImageGallery = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       selectionLimit: 1,
@@ -73,7 +76,7 @@ const RegisterScreen = () => {
     }
   };
 
-  const handleLaunchImageGallery = async () => {
+  const handleLaunchCamera = async () => {
     if (Platform.OS === 'android') {
       const grantedCamera = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -109,6 +112,53 @@ const RegisterScreen = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    console.log('calling register');
+    setLoading(true);
+    setLoadingMessage('Registering...');
+    const trimmedUsername = username.trim().toLowerCase();
+    const trimmedFullName = fullName.trim();
+    const trimmedBio = bio.trim();
+
+    if (
+      !trimmedUsername ||
+      !trimmedFullName ||
+      !trimmedBio ||
+      !usernameAvailable
+    ) {
+      Alert.alert('All fields are required');
+      setLoading(false);
+      setLoadingMessage('');
+      return;
+    }
+
+    let userImage = imageUri;
+    if (isLocalImagePickedUp) {
+      setLoadingMessage('Uploading image...');
+      const uploadResult = await dispatch(uploadFile(imageUri, "user_image"));
+      if (uploadResult) {
+        userImage = uploadResult;
+        setLoadingMessage("Image uploaded");
+      } else {
+        setLoading(false);
+        setLoadingMessage('');
+        return;
+      }
+    }
+    setLoadingMessage("Preparing Dashboard...");
+    const registerData = {
+      name: fullName,
+      bio,
+      userImage,
+      email: item?.email,
+      provider: item?.provider,
+      id_token: item?.id_token,
+      username
+    }
+    await dispatch(register(registerData));
+    setLoading(false);
+  }
+
   return (
     <CustomSafeAreaView>
       <KeyboardAwareScrollView
@@ -141,13 +191,85 @@ const RegisterScreen = () => {
           style={styles.imageContainer}
           onPress={handleImagePicker}>
           <Image
-            source={imageUri ? imageUri : require('../../assets/images/placeholder.png')}
+            source={imageUri ? { uri: imageUri } : require('../../assets/images/placeholder.png')}
             style={styles.image}
           />
           <View style={styles.cameraIcon}>
             <Icon name="camera-alt" color="white" size={RFValue(20)} />
           </View>
         </TouchableOpacity>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <CustomText style={styles.label}>Username</CustomText>
+          {usernameAvailable !== null && (
+            <CustomText
+              variant='h8'
+              fontFamily={FONTS.SemiBold}
+              style={[styles.label, { alignSelf: 'flex-end' }]}>
+              {usernameAvailable ? 'Available' : 'Not Available'}
+            </CustomText>
+          )}
+        </View>
+
+        <TextInput
+          style={styles.input}
+          returnKeyType='next'
+          value={username}
+          placeholderTextColor={Colors.border}
+          onChangeText={setUsername}
+          onEndEditing={async () => {
+            await checkUsername();
+          }}
+          placeholder='Enter unique username'
+          autoComplete='off'
+        />
+
+        <CustomText style={styles.label}>Full Name</CustomText>
+        <TextInput
+          style={styles.input}
+          returnKeyType='next'
+          value={fullName}
+          placeholderTextColor={Colors.border}
+          onChangeText={setFullName}
+          placeholder='Enter full name'
+        />
+
+        <CustomText style={styles.label}>Short Bio</CustomText>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={bio}
+          placeholderTextColor={Colors.border}
+          onChangeText={setBio}
+          placeholder='Enter your bio'
+          multiline={true}
+          numberOfLines={4}
+        />
+
+        {
+          loading ? (
+            <View style={styles.flexRow}>
+              <ActivityIndicator size='small' color={Colors.text} />
+              <CustomText variant='h8' fontFamily={FONTS.Medium}>
+                {loadingMessage || 'Loading...'}
+              </CustomText>
+            </View>
+          ) : (
+            <GradientButton
+              text="Let's dive in"
+              iconName="swim"
+              onPress={handleSubmit}
+            />
+          )
+        }
+
+
       </KeyboardAwareScrollView>
     </CustomSafeAreaView>
   );
@@ -195,6 +317,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.Medium,
     padding: 10,
     marginVertical: 10,
+    width: '100%',
   },
   image: {
     width: 150,
@@ -202,7 +325,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderWidth: 2,
     borderRadius: 200,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   imageContainer: {
     alignItems: 'center',
