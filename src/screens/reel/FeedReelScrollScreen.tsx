@@ -34,12 +34,13 @@ const FeedReelScrollScreen: FC = () => {
   }).current;
 
   const onViewableItemsChanged = useRef(
-    debounce(({ viewableItem }: { viewableItem: Array<ViewToken> }) => {
-      if (viewableItem.length > 0) {
-        setCurrentVisibleIndex(viewableItem[0].index || 0);
+    debounce(({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
+      if (viewableItems?.length > 0) {
+        setCurrentVisibleIndex(viewableItems[0]?.index || 0);
       }
     }, 100)
   ).current;
+
 
   const getItemLayout = useCallback((data: any, index: number) => ({
     length: screenHeight,
@@ -99,11 +100,12 @@ const FeedReelScrollScreen: FC = () => {
   const memoizedValue = useMemo(() => renderVideoList, [currentVisibleIndex, data]);
 
   useEffect(() => {
-    if (routeParams?.data) {
-      setData(routeParams?.data);
-      setOffset(routeParams?.data?.length);
+    if (Array.isArray(routeParams?.data)) {
+      setData(routeParams.data);
+      setOffset(routeParams.data.length);
     }
-  }, [routeParams?.data])
+  }, [routeParams?.data]);
+
 
   return (
     <CustomView>
@@ -124,13 +126,13 @@ const FeedReelScrollScreen: FC = () => {
         onViewableItemsChanged={onViewableItemsChanged}
         initialNumToRender={1}
         onEndReachedThreshold={0.1}
-        ListFooterComponent={() => {
-          {
-            loading ? <View style={styles.footer}>
-              <ActivityIndicator size='small' color={Colors.white} />
-            </View> : null
-          }
-        }}
+        ListFooterComponent={() =>
+          loading ? (
+            <View style={styles.footer}>
+              <ActivityIndicator size="small" color={Colors.white} />
+            </View>
+          ) : null
+        }
         decelerationRate={'normal'}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
