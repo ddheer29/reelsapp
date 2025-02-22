@@ -155,7 +155,14 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
   )
 }
 
-export default VideoItem
+const areEqual = (prevProps: VideoItemProps, nextProps: VideoItemProps) => {
+  return (
+    prevProps?.item?._id === nextProps?.item?._id &&
+    prevProps?.isVisible === nextProps?.isVisible
+  )
+}
+
+export default React.memo(VideoItem, areEqual);
 
 const styles = StyleSheet.create({
   container: {
