@@ -21,7 +21,7 @@ export const followingSlice = createSlice({
   reducers: {
     addFollowing: (state, action: PayloadAction<FollowingUser>) => {
       const index = state.following.findIndex((user) => user.id === action.payload.id);
-      if (index === -1) {
+      if (index !== -1) {
         state.following[index] = action.payload;
       } else {
         state.following.push(action.payload);

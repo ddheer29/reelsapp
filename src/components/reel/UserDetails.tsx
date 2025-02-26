@@ -1,20 +1,34 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { FC } from 'react'
+import React, { FC, useMemo } from 'react'
 import FastImage from 'react-native-fast-image';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHook';
 import { selectUser } from '../../redux/reducers/userSlice';
 import { Colors } from '../../constants/Colors';
 import CustomText from '../global/CustomText';
 import { FONTS } from '../../constants/Fonts';
+import { selectFollowing } from '../../redux/reducers/followingSlice';
+import { toggleFollow } from '../../redux/actions/userAction';
 
 interface UserDetailsProps {
   user: any;
 }
 
-const UserDetails: FC<UserDetailsProps> = ({ user }) => {
-
+const UserDetails: FC<UserDetailsProps> = React.memo(({ user }) => {
+  const dispatch = useAppDispatch();
   const loggedInUser = useAppSelector(selectUser)
-  const isFollowing = true;
+  const followingUsers = useAppSelector(selectFollowing)
+
+  const isFollowing = useMemo(() => {
+    return (
+      followingUsers?.find((item: any) => {
+        item?.id === user._id;
+      })?.isFollowing ?? user?.isFollowing
+    )
+  }, [followingUsers, user._id, user.isFollowing]);
+
+  const handleFollow = async () => {
+    await dispatch(toggleFollow(user._id));
+  }
 
   return (
     <View>
@@ -27,8 +41,9 @@ const UserDetails: FC<UserDetailsProps> = ({ user }) => {
         <CustomText variant='h8' fontFamily={FONTS.Medium}>
           {user?.username}
         </CustomText>
-        {loggedInUser?.id !== user?.id && (
+        {loggedInUser?.id !== user?._id && (
           <TouchableOpacity
+            onPress={handleFollow}
             style={[
               styles.follow,
               {
@@ -46,7 +61,7 @@ const UserDetails: FC<UserDetailsProps> = ({ user }) => {
       </TouchableOpacity>
     </View>
   )
-}
+})
 
 export default UserDetails
 

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { screenHeight, screenWidth } from '../../utils/Scaling';
-import { useAppDispatch } from '../../redux/reduxHook';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHook';
 import { useIsFocused } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import Loader from '../../assets/images/loader.jpg';
@@ -13,6 +13,8 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import LottieView from 'lottie-react-native';
 import DoubleTapAnim from '../../assets/animations/heart.json';
 import ReelItem from './ReelItem';
+import { toggleLikeReel } from '../../redux/actions/likeAction';
+import { selectLikedReel } from '../../redux/reducers/likeSlice';
 
 interface VideoItemProps {
   item: any;
@@ -23,12 +25,29 @@ interface VideoItemProps {
 const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
 
   const dispatch = useAppDispatch();
+  const likedReels = useAppSelector(selectLikedReel);
   const [paused, setPaused] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
   const [showLikeAnim, setShowLikeAnim] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
+
+  const reelMeta = useMemo(() => {
+    return {
+      isLiked:
+        likedReels?.find((ritem: any) => ritem._id === item?._id)?.isLiked ??
+        item?.isLiked,
+      likesCount:
+        likedReels?.find((ritem: any) => ritem._id === item?._id)?.likesCount ??
+        item?.likesCount
+    }
+  }, [likedReels, item?._id])
+
+  const handleLikedReel = async () => {
+    console.log('called like reel');
+    await dispatch(toggleLikeReel(item._id, reelMeta?.likesCount));
+  }
 
   const handleVideoLoad = () => {
     setVideoLoaded(true);
@@ -47,18 +66,26 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
 
   const handleDoubleTap = useCallback(() => {
     setShowLikeAnim(true);
+    if (!reelMeta?.isLiked) {
+      handleLikedReel();
+    }
     setTimeout(() => {
       setShowLikeAnim(false);
-    }, 700);
-  }, [])
+    }, 1200);
+  }, [reelMeta])
 
-  const singleTap = Gesture.Tap().maxDuration(250).onStart(() => {
-    handleTogglePlay();
-  }).runOnJS(true);
+  const singleTap = Gesture.Tap()
+    .maxDuration(250)
+    .onStart(() => {
+      handleTogglePlay();
+    }).runOnJS(true);
 
-  const doubleTap = Gesture.Tap().maxDuration(250).numberOfTaps(2).onStart(() => {
-    handleDoubleTap();
-  }).runOnJS(true);
+  const doubleTap = Gesture.Tap()
+    .maxDuration(250)
+    .numberOfTaps(2)
+    .onStart(() => {
+      handleDoubleTap();
+    }).runOnJS(true);
 
   useEffect(() => {
     setIsPaused(!isVisible);
@@ -156,13 +183,15 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
       <ReelItem
         user={item?.user}
         description={item?.caption}
-        likes={22}
+        likes={reelMeta?.likesCount || 0}
         comments={29}
-        onLike={() => { }}
+        onLike={() => {
+          handleLikedReel();
+        }}
         onComment={() => { }}
         onShare={() => { }}
         onLongPressLike={() => { }}
-        isLiked={true}
+        isLiked={reelMeta?.isLiked}
       />
     </View>
   )
