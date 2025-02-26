@@ -15,6 +15,7 @@ import DoubleTapAnim from '../../assets/animations/heart.json';
 import ReelItem from './ReelItem';
 import { toggleLikeReel } from '../../redux/actions/likeAction';
 import { selectLikedReel } from '../../redux/reducers/likeSlice';
+import { SheetManager } from 'react-native-actions-sheet';
 
 interface VideoItemProps {
   item: any;
@@ -190,7 +191,14 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
         }}
         onComment={() => { }}
         onShare={() => { }}
-        onLongPressLike={() => { }}
+        onLongPressLike={() => {
+          SheetManager.show('like-sheet', {
+            payload: {
+              type: 'reel',
+              entityId: item?._id
+            }
+          });
+        }}
         isLiked={reelMeta?.isLiked}
       />
     </View>

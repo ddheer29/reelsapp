@@ -17,3 +17,15 @@ export const toggleLikeReel = (id: string, likesCount: number) => async (dispatc
     console.log("🚀 ~ toggleLikeReel ~ error:", error)
   }
 }
+
+export const getListLikes = (data: any, searchQuery: string) => async (dispatch: any) => {
+  try {
+    const res = await appAxios.get(
+      `/like?entityId=${data?.entityId}&type=${data?.type}&searchQuery=${searchQuery}`
+    );
+    return res.data;
+  } catch (error) {
+    console.log("🚀 ~ getListLikes ~ error:", error);
+    return [];
+  }
+}
