@@ -189,7 +189,15 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
         onLike={() => {
           handleLikedReel();
         }}
-        onComment={() => { }}
+        onComment={() => {
+          SheetManager.show('comment-sheet', {
+            payload: {
+              id: item?._id,
+              user: item?.user,
+              commentsCount: item.commentsCount
+            }
+          });
+        }}
         onShare={() => { }}
         onLongPressLike={() => {
           SheetManager.show('like-sheet', {
