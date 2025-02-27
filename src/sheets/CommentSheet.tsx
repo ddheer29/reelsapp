@@ -1,5 +1,5 @@
-import { FlatList, Keyboard, Platform, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, Keyboard, Platform, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import ActionSheet, { SheetManager, SheetProps } from 'react-native-actions-sheet'
 import { screenHeight } from '../utils/Scaling'
 import { Colors } from '../constants/Colors'
@@ -13,7 +13,7 @@ import { getComments } from '../redux/actions/commentAction'
 import UserItem from '../components/global/UserItem'
 
 const CommentSheet = (props: SheetProps<"comment-sheet">) => {
-
+  const flatListRef = useRef<FlatList>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const [replyTo, setReplyTo] = useState<Comment | SubReply | null>(null);
@@ -106,17 +106,79 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
               )
             }}
             style={{ height: '100%', marginTop: 20 }}
-          // ListFooterComponent={() => (
-          //   <>
-          //   {
-          //     searchUserLoading && (
-
-          //     )
-          //   }
-          //   </>
-          // )}
+            ListFooterComponent={() => (
+              <>
+                {
+                  searchUserLoading && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        margin: 20,
+                        gap: 4,
+                      }}
+                    >
+                      <CustomText>
+                        {mentionSearchWord !== '' && `Searching for ${mentionSearchWord}`}
+                      </CustomText>
+                      <ActivityIndicator
+                        size={"small"}
+                        color={Colors.border}
+                      />
+                    </View>
+                  )
+                }
+              </>
+            )}
           />
-        ) : (null)
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={commentData}
+            nestedScrollEnabled
+            style={{ height: '100%' }}
+            keyboardShouldPersistTaps='always'
+            keyboardDismissMode='interactive'
+            onScrollToIndexFailed={() => { }}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            removeClippedSubviews={true}
+            onEndReachedThreshold={0.08}
+            ListFooterComponent={() => {
+              if (!loading) {
+                return null;
+              }
+              return (
+                <View>
+                  <ActivityIndicator style={styles.loading} size='small' color={Colors.border} />
+                </View>
+              )
+            }}
+            onEndReached={() => {
+              if (hasMore) {
+                fetchComments(offset);
+              }
+            }}
+            ListEmptyComponent={() => {
+              if (loading) {
+                return null
+              }
+              return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 40 }}>
+                  <CustomText variant='h7'>No Comments yet!</CustomText>
+                </View>
+              )
+            }}
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item, index }) => {
+              return (
+                <View>
+                  <CustomText>{index}</CustomText>
+                </View>
+              )
+            }}
+          />
+        )
       }
 
     </ActionSheet>
