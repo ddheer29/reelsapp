@@ -11,6 +11,7 @@ import { getSearchUsers } from '../redux/actions/userAction'
 import { s } from 'react-native-size-matters'
 import { getComments } from '../redux/actions/commentAction'
 import UserItem from '../components/global/UserItem'
+import CommentInput from '../comment/CommentInput'
 
 const CommentSheet = (props: SheetProps<"comment-sheet">) => {
   const flatListRef = useRef<FlatList>(null);
@@ -54,6 +55,13 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
     }
     setCommentData(removeDuplicate([...commentData, ...newData]));
     setLoading(false);
+  }
+
+  const handleReplyComment = async (data: any) => {
+
+  }
+  const handlePostComment = async (data: any) => {
+
   }
 
   useEffect(() => {
@@ -180,6 +188,23 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
           />
         )
       }
+
+      <CommentInput
+        setMentionSearchWord={(value) => setMentionSearchWord(value)}
+        confirmMention={confirmMention}
+        replyTo={replyTo}
+        onPostComment={((data: any) => {
+          if (replyCommentId) {
+            handleReplyComment(data)
+          } else {
+            handlePostComment(data)
+          }
+        })}
+        clearReplyTo={() => {
+          setReplyTo(null);
+          setReplyCommentId(null);
+        }}
+      />
 
     </ActionSheet>
   )
