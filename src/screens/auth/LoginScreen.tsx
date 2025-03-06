@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Google from '../../assets/icons/google.png';
 import { useAppDispatch } from '../../redux/reduxHook';
 import { signInWithFacebook, signInWithGoogle } from '../../redux/SocialLogin';
-import { resetAndNavigate } from '../../utils/NavigationUtil';
+import { navigate, resetAndNavigate } from '../../utils/NavigationUtil';
 
 const LoginScreen = () => {
 
@@ -60,6 +60,14 @@ const LoginScreen = () => {
         textColor="#000"
         backgroundColor={Colors.white}
       />
+
+      <View style={{ marginVertical: 20 }}>
+        <TouchableOpacity onPress={() => navigate('LoginEmail')}>
+          <CustomText variant="h6" style={{ color: Colors.text }}>
+            Login with Id and Password
+          </CustomText>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.footerText}>
         <CustomText variant="h8">
