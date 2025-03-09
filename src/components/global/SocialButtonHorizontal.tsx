@@ -29,7 +29,7 @@ const SocialButtonHorizontal: FC<SocialButtonHorizontalProps> = ({
       onPress={onPress}
     >
       {icon}
-      <CustomText variant='h8' style={[styles.text, textStyle]}>
+      <CustomText variant='h6' style={[styles.text, textStyle]}>
         {text}
       </CustomText>
     </TouchableOpacity>

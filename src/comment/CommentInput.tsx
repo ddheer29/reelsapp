@@ -1,5 +1,5 @@
-import { Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { FC, useRef, useState } from 'react'
+import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { Colors } from '../constants/Colors';
 import { emojiListData } from '../utils/staticData';
 import CustomText from '../components/global/CustomText';
@@ -7,8 +7,10 @@ import FastImage from 'react-native-fast-image';
 import { useAppSelector } from '../redux/reduxHook';
 import { selectUser } from '../redux/reducers/userSlice';
 import { FONTS } from '../constants/Fonts';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
+import GIFIcon from "../assets/icons/gif.png";
+import { SheetManager } from 'react-native-actions-sheet';
 
 interface CommentInputProps {
   replyTo: Comment | SubReply | null;
@@ -39,12 +41,82 @@ const CommentInput: FC<CommentInputProps> = ({
     setComment(text);
   }
 
-  const handleSelectionChange = (event: string) => {
+  const handleSelectionChange = (event: any) => {
     const cursorPos = event.nativeEvent.selection.start;
     setTimeout(() => {
       setCursorPosition(cursorPos);
     }, 100);
   }
+
+  const handleSend = (res: string | null) => {
+    if (res) {
+      clearReplyTo();
+      setMention('');
+      setComment('');
+      onPostComment({
+        hasGif: true,
+        gifUrl: res,
+      })
+      return;
+    }
+    onPostComment({
+      comment,
+      hasGif: false,
+    })
+    clearReplyTo();
+    setMention('');
+    setComment('');
+  }
+
+  const replaceMentionCursor = (
+    text: string,
+    replaceWord: string,
+    newWord: string,
+    cursorPos: number) => {
+    const index = text.lastIndexOf(`@${replaceWord}`, cursorPos)
+    if (index !== -1 && index < cursorPos) {
+      return (
+        text.slice(0, index) + `@${newWord}` + text.slice(index + replaceWord.length + 1)
+      )
+    }
+    return text;
+  }
+
+  useEffect(() => {
+    if (replyTo) {
+      const mentionText = `@${replyTo.user?.username}`;
+      setMention(mentionText);
+      setComment(mentionText);
+      textInputRef.current?.focus();
+    } else {
+      setMention('');
+      setComment('');
+    }
+  }, [replyTo])
+
+  useEffect(() => {
+    const textBeforeCursor = comment.slice(0, cursorPosition);
+    const match = textBeforeCursor.match(/(^\s)@([a-zA-Z]*)$/);
+    if (match) {
+      const lastWord = match[2];
+      setMentionSearchWord(lastWord);
+    } else {
+      setMentionSearchWord(null);
+    }
+  }, [cursorPosition])
+
+  useEffect(() => {
+    if (confirmMention !== null) {
+      setComment(
+        replaceMentionCursor(
+          comment,
+          confirmMention.replaceWord,
+          confirmMention.user?.username,
+          cursorPosition,
+        )
+      )
+    }
+  }, [confirmMention])
 
   return (
     <View style={styles.container}>
@@ -106,13 +178,28 @@ const CommentInput: FC<CommentInputProps> = ({
               onChangeText={handleInputChange}
               onSelectionChange={handleSelectionChange}
             />
-            {/* {
-              comment ? (null) : (
-                <TouchableOpacity>
-
+            {
+              comment ? (
+                <TouchableOpacity onPress={() => handleSend(null)}>
+                  <Icon
+                    name={comment ? 'send' : 'emoji-emotions'}
+                    size={RFValue(20)}
+                    color={Colors.text}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={async () => {
+                    const res = await SheetManager.show("gif-sheet");
+                    if (res) {
+                      handleSend(res);
+                    }
+                  }}
+                >
+                  <Image source={GIFIcon} tintColor={Colors.lightText} style={styles.gifIcon} />
                 </TouchableOpacity>
               )
-            } */}
+            }
           </View>
         </View>
       </View>
@@ -125,8 +212,8 @@ export default CommentInput
 const styles = StyleSheet.create({
   flexRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     padding: Platform.OS === 'ios' ? 10 : 0,
+    alignItems: 'center',
   },
   input: {
     width: '86%',
@@ -175,5 +262,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderColor: Colors.lightText,
     justifyContent: 'space-between'
+  },
+  gifIcon: {
+    width: 23,
+    height: 23,
   }
 })
