@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHook'
 import { selectUser } from '../redux/reducers/userSlice'
 import { getSearchUsers } from '../redux/actions/userAction'
 import { s } from 'react-native-size-matters'
-import { getComments } from '../redux/actions/commentAction'
+import { getComments, postComment } from '../redux/actions/commentAction'
 import UserItem from '../components/global/UserItem'
 import CommentInput from '../comment/CommentInput'
 
@@ -27,6 +27,10 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
   const [commentData, setCommentData] = useState<any[]>([]);
   const [mentionSearchWord, setMentionSearchWord] = useState<string | null>(null);
   const [confirmMention, setConfirmMention] = useState<any | null>(false);
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+  }
 
   const removeDuplicate = (data: any) => {
     const uniqueData = new Map();
@@ -76,8 +80,25 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
     commentData.unshift(newComment);
     setCommentData([...commentData]);
+    scrollToTop();
     setReplyTo(null);
     setReplyCommentId(null);
+
+    const commentPostData = {
+      reelId: props.payload?.id,
+      ...(data?.hasGif ? { gifUrl: data?.gifUrl } : { comment: data?.comment }),
+    }
+
+    const commentReponse = await dispatch(postComment(commentPostData, props.payload?.commentsCount || 0));
+
+    const tempCommentIndex = commentData.findIndex((comment) => comment._id === newCommentId);
+
+    // replace the temporary comment with the actual comment
+    if (tempCommentIndex !== -1) {
+      commentData[tempCommentIndex] = commentReponse;
+      commentData[tempCommentIndex].user = user;
+      setCommentData([...commentData]);
+    }
 
   }
 
