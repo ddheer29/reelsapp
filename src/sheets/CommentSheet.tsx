@@ -12,6 +12,7 @@ import { s } from 'react-native-size-matters'
 import { getComments, postComment } from '../redux/actions/commentAction'
 import UserItem from '../components/global/UserItem'
 import CommentInput from '../comment/CommentInput'
+import CommentItem from '../components/comment/CommentItem'
 
 const CommentSheet = (props: SheetProps<"comment-sheet">) => {
   const flatListRef = useRef<FlatList>(null);
@@ -30,6 +31,13 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
   const scrollToTop = () => {
     flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+  }
+
+  const scrollToComment = (index: number, childIndex: number = 0) => {
+    const sum = index + childIndex;
+    if (flatListRef.current && sum < commentData?.length) {
+      flatListRef.current?.scrollToIndex({ index: sum, animated: true, viewOffset: 0 });
+    }
   }
 
   const removeDuplicate = (data: any) => {
@@ -100,6 +108,11 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
       setCommentData([...commentData]);
     }
 
+  }
+
+  const handleReply = (comment: Comment | SubReply, replyCommentId: string | number) => {
+    setReplyTo(comment);
+    setReplyCommentId(replyCommentId);
   }
 
   useEffect(() => {
@@ -218,9 +231,17 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
             keyExtractor={(item) => item._id.toString()}
             renderItem={({ item, index }) => {
               return (
-                <View>
-                  <CustomText>{index}</CustomText>
-                </View>
+                <CommentItem
+                  user={props?.payload?.user}
+                  scrollToParentComment={() => scrollToComment(index)}
+                  comment={item}
+                  scrollToChildComment={childIndex => {
+                    scrollToComment(index, childIndex)
+                  }}
+                  onReply={(comment, replyCommentId) => {
+                    handleReply(comment, replyCommentId)
+                  }}
+                />
               )
             }}
           />

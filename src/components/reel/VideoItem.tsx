@@ -16,6 +16,7 @@ import ReelItem from './ReelItem';
 import { toggleLikeReel } from '../../redux/actions/likeAction';
 import { selectLikedReel } from '../../redux/reducers/likeSlice';
 import { SheetManager } from 'react-native-actions-sheet';
+import { selectComments } from '../../redux/reducers/commentSlice';
 
 interface VideoItemProps {
   item: any;
@@ -27,6 +28,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
 
   const dispatch = useAppDispatch();
   const likedReels = useAppSelector(selectLikedReel);
+  const commentsCount = useAppSelector(selectComments);
   const [paused, setPaused] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
@@ -44,6 +46,12 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
         item?.likesCount
     }
   }, [likedReels, item?._id])
+
+  const commentMeta = useMemo(() => {
+    return (
+      commentsCount?.find((ritem: any) => ritem.reelId === item?._id)?.commentsCount ?? item?.commentsCount
+    )
+  }, [commentsCount, item?._id])
 
   const handleLikedReel = async () => {
     console.log('called like reel');
@@ -142,7 +150,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
                   controls={false}
                   disableFocus={false}
                   style={styles.videoContainer}
-                  paused={isPaused}
+                  paused={true}
                   repeat={true}
                   hideShutterView
                   minLoadRetryCount={5}
@@ -185,7 +193,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
         user={item?.user}
         description={item?.caption}
         likes={reelMeta?.likesCount || 0}
-        comments={29}
+        comments={commentMeta}
         onLike={() => {
           handleLikedReel();
         }}
