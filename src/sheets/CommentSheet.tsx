@@ -61,6 +61,23 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
   }
   const handlePostComment = async (data: any) => {
+    const newCommentId = commentData?.length + 1;
+    const timestamp = new Date().toISOString();
+    const newComment = {
+      _id: newCommentId,
+      user: user,
+      content: data.comment || '',
+      timestamp: timestamp,
+      hasGif: data?.hasGif || false,
+      isPosting: true,
+      girUrl: data?.hasGif ? data?.gifUrl : undefined,
+      replyTo: [],
+    }
+
+    commentData.unshift(newComment);
+    setCommentData([...commentData]);
+    setReplyTo(null);
+    setReplyCommentId(null);
 
   }
 

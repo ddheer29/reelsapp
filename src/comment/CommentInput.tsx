@@ -96,7 +96,7 @@ const CommentInput: FC<CommentInputProps> = ({
 
   useEffect(() => {
     const textBeforeCursor = comment.slice(0, cursorPosition);
-    const match = textBeforeCursor.match(/(^\s)@([a-zA-Z]*)$/);
+    const match = textBeforeCursor.match(/(^|\s)@([a-zA-Z]*)$/);
     if (match) {
       const lastWord = match[2];
       setMentionSearchWord(lastWord);
