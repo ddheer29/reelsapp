@@ -11,8 +11,8 @@ import { getSearchUsers } from '../redux/actions/userAction'
 import { s } from 'react-native-size-matters'
 import { getComments, postComment } from '../redux/actions/commentAction'
 import UserItem from '../components/global/UserItem'
-import CommentInput from '../comment/CommentInput'
 import CommentItem from '../components/comment/CommentItem'
+import CommentInput from '../components/comment/CommentInput'
 
 const CommentSheet = (props: SheetProps<"comment-sheet">) => {
   const flatListRef = useRef<FlatList>(null);

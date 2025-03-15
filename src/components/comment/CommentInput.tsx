@@ -1,16 +1,16 @@
 import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { Colors } from '../constants/Colors';
-import { emojiListData } from '../utils/staticData';
-import CustomText from '../components/global/CustomText';
 import FastImage from 'react-native-fast-image';
-import { useAppSelector } from '../redux/reduxHook';
-import { selectUser } from '../redux/reducers/userSlice';
-import { FONTS } from '../constants/Fonts';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
-import GIFIcon from "../assets/icons/gif.png";
+import GIFIcon from "../../assets/icons/gif.png";
 import { SheetManager } from 'react-native-actions-sheet';
+import { useAppSelector } from '../../redux/reduxHook';
+import { emojiListData } from '../../utils/staticData';
+import CustomText from '../global/CustomText';
+import { Colors } from '../../constants/Colors';
+import { selectUser } from '../../redux/reducers/userSlice';
+import { FONTS } from '../../constants/Fonts';
 
 interface CommentInputProps {
   replyTo: Comment | SubReply | null;

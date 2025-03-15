@@ -1,5 +1,5 @@
 import { appAxios } from "../apiConfig"
-import { addLikedReel } from "../reducers/likeSlice";
+import { addLikedComment, addLikedReel, addLikedReply } from "../reducers/likeSlice";
 
 export const toggleLikeReel = (id: string, likesCount: number) => async (dispatch: any) => {
   try {
@@ -27,5 +27,34 @@ export const getListLikes = (data: any, searchQuery: string) => async (dispatch:
   } catch (error) {
     console.log("🚀 ~ getListLikes ~ error:", error);
     return [];
+  }
+}
+
+export const toggleLikeComment = (id: string, likesCount: number) => async (dispatch: any) => {
+  try {
+    console.log(`/like/reel/${id}`);
+    const res = await appAxios.post(`/like/comment/${id}`);
+    const data = {
+      id: id,
+      isLiked: res.data.msg === 'Unliked' ? false : true,
+      likesCount: res.data.msg === 'Unliked' ? likesCount - 1 : likesCount + 1
+    }
+    dispatch(addLikedComment(data));
+  } catch (error) {
+    console.log("🚀 ~ toggleLikeComment ~ error:", error)
+  }
+}
+
+export const toggleLikeReply = (id: string, likesCount: number) => async (dispatch: any) => {
+  try {
+    const res = await appAxios.post(`/like/reply/${id}`);
+    const data = {
+      id: id,
+      isLiked: res.data.msg === 'Unliked' ? false : true,
+      likesCount: res.data.msg === 'Unliked' ? likesCount - 1 : likesCount + 1
+    }
+    dispatch(addLikedReply(data));
+  } catch (error) {
+    console.log("🚀 ~ toggleLikeReply ~ error:", error)
   }
 }

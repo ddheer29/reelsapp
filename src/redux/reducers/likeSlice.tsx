@@ -8,12 +8,28 @@ interface LikedReel {
   likesCount: number;
 }
 
+interface LikedComment {
+  id: string;
+  isLiked: boolean;
+  likesCount: number;
+}
+
+interface LikedReply {
+  id: string;
+  isLiked: boolean;
+  likesCount: number;
+}
+
 interface LikeState {
   LikedReel: LikedReel[];
+  LikedComment: LikedComment[];
+  LikedReply: LikedReply[];
 }
 
 const initialState: LikeState = {
   LikedReel: [],
+  LikedComment: [],
+  LikedReply: []
 }
 
 export const likesSlice = createSlice({
@@ -31,10 +47,32 @@ export const likesSlice = createSlice({
         state.LikedReel.push(action.payload);
       }
       console.log('here is like state:', initialState)
+    },
+    addLikedComment: (state, action: PayloadAction<LikedComment>) => {
+      const index = state.LikedComment.findIndex(
+        (user) => user.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.LikedComment[index] = action.payload;
+      } else {
+        state.LikedComment.push(action.payload);
+      }
+    },
+    addLikedReply: (state, action: PayloadAction<LikedReply>) => {
+      const index = state.LikedReply.findIndex(
+        (user) => user.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.LikedReply[index] = action.payload;
+      } else {
+        state.LikedReply.push(action.payload);
+      }
     }
   }
 })
 
-export const { addLikedReel } = likesSlice.actions;
+export const { addLikedReel, addLikedComment, addLikedReply } = likesSlice.actions;
 export const selectLikedReel = (state: RootState) => state.like.LikedReel;
+export const selectLikedComment = (state: RootState) => state.like.LikedComment;
+export const selectLikedReply = (state: RootState) => state.like.LikedReply;
 export default likesSlice.reducer;
