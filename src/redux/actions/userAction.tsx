@@ -4,8 +4,9 @@ import { setUser } from '../reducers/userSlice';
 import { CHECK_USERNAME, REGISTER } from '../API';
 import { Alert } from 'react-native';
 import { token_storage } from '../storage';
-import { navigate } from '../../utils/NavigationUtil';
+import { navigate, resetAndNavigate } from '../../utils/NavigationUtil';
 import { addFollowing } from '../reducers/followingSlice';
+import { persistor } from '../store';
 
 interface registerData {
   id_token: string;
@@ -78,3 +79,9 @@ export const getSearchUsers = (text: string) => async (dispatch: any) => {
     console.log("🚀 ~ getSearchUsers ~ error:", error)
   }
 };
+
+export const Logout = () => async (dispatch: any) => {
+  await token_storage.clearAll();
+  await persistor.purge();
+  resetAndNavigate('LoginScreen');
+}

@@ -124,7 +124,7 @@ const CommentSingleItem: FC<CommentSingleItemProps> = ({
         <TouchableOpacity
           onPress={() => {
             SheetManager.hide("comment-sheet")
-            navigate("UserProfileScreen", { username: comment?.user?.username })
+            navigate("Profile", { username: comment?.user?.username })
           }}
         >
           <Image source={{ uri: comment?.user?.userImage }} style={styles.userImage} />
