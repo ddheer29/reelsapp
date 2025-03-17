@@ -59,7 +59,7 @@ const ProfileDetails: FC<{ user: User }> = ({ user }) => {
             <StatsComponent
               count={user?.followersCount}
               label='Followers'
-              onPress={() => push('FollowersScreen', {
+              onPress={() => push('FollowingScreen', {
                 user: user?._id,
                 type: 'Followers'
               })}

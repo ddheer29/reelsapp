@@ -1,28 +1,46 @@
-import { StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
-import React, { ReactNode } from 'react';
+import {
+  View,
+  Text,
+  TextStyle,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import React, { FC } from 'react';
 import { FONTS } from '../../constants/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Colors } from '../../constants/Colors';
+import { SheetManager } from 'react-native-actions-sheet';
+import { navigate } from '../../utils/NavigationUtil';
 
 interface Props {
-  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'h7' | 'h8' | 'h9' | 'body';
+  variant?:
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'h7'
+  | 'h8'
+  | 'h9'
+  | 'body';
   fontFamily?: FONTS;
   fontSize?: number;
   style?: TextStyle | TextStyle[];
-  children: ReactNode;
+  children?: React.ReactNode;
   numberOfLines?: number;
   onLayout?: (event: object) => void;
   onMentionPress?: (mention: string) => void;
 }
 
-const CustomText: React.FC<Props> = ({
+const CustomText: FC<Props> = ({
   variant = 'body',
-  fontFamily,
+  fontFamily = FONTS.Regular,
   fontSize,
   style,
+  onLayout,
   children,
   numberOfLines,
-  onLayout,
   onMentionPress,
 }) => {
   let computedFontSize: number;
@@ -59,7 +77,12 @@ const CustomText: React.FC<Props> = ({
   }
 
   const handleUserPress = async (mention: string) => {
-    console.log('HandlePress Clicked!!');
+    if (SheetManager.get('comment-sheet')?.current?.isOpen()) {
+      await SheetManager.hide('comment-sheet');
+    }
+    navigate('UserProfileScreen', {
+      username: mention,
+    });
   };
 
   const renderTextWithMentions = (text: string): JSX.Element[] => {
@@ -74,7 +97,10 @@ const CustomText: React.FC<Props> = ({
         elements.push(
           <Text
             onLayout={onLayout}
-            numberOfLines={numberOfLines !== undefined ? numberOfLines : undefined}
+            numberOfLines={
+              numberOfLines !== undefined ? numberOfLines : undefined
+            }
+            key={lastIndex}
             style={[
               styles.text,
               {
@@ -83,10 +109,9 @@ const CustomText: React.FC<Props> = ({
                 fontFamily: fontFamily,
               },
               style,
-            ]}
-          >
+            ]}>
             {plainTextBeforeMention}
-          </Text>
+          </Text>,
         );
       }
       elements.push(
@@ -104,20 +129,23 @@ const CustomText: React.FC<Props> = ({
                 fontFamily: fontFamily,
               },
               style,
-            ]}
-          >
+            ]}>
             {`@${mention}`}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>,
       );
+
       lastIndex = mentionRegex.lastIndex;
     }
+
     const plainTextAfterLastMention = text.substring(lastIndex);
     if (plainTextAfterLastMention) {
       elements.push(
         <Text
           onLayout={onLayout}
-          numberOfLines={numberOfLines !== undefined ? numberOfLines : undefined}
+          numberOfLines={
+            numberOfLines !== undefined ? numberOfLines : undefined
+          }
           key={lastIndex}
           style={[
             styles.text,
@@ -127,12 +155,12 @@ const CustomText: React.FC<Props> = ({
               fontFamily: fontFamily,
             },
             style,
-          ]}
-        >
+          ]}>
           {plainTextAfterLastMention}
-        </Text>
+        </Text>,
       );
     }
+
     return elements;
   };
 
@@ -143,25 +171,24 @@ const CustomText: React.FC<Props> = ({
       ) : (
         <Text
           onLayout={onLayout}
-          numberOfLines={numberOfLines !== undefined ? numberOfLines : undefined}
+          numberOfLines={
+            numberOfLines !== undefined ? numberOfLines : undefined
+          }
           style={[
             styles.text,
             {
               color: Colors.text,
-              fontFamily: fontFamily,
               fontSize: computedFontSize,
+              fontFamily: fontFamily,
             },
             style,
-          ]}
-        >
+          ]}>
           {children}
         </Text>
       )}
     </View>
   );
 };
-
-export default CustomText;
 
 const styles = StyleSheet.create({
   container: {
@@ -176,3 +203,5 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
+
+export default CustomText;

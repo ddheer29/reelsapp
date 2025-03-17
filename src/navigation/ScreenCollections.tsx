@@ -9,6 +9,7 @@ import FeedReelScrollScreen from '../screens/reel/FeedReelScrollScreen';
 import LoginEmail from '../screens/auth/LoginEmail';
 import ReelScrollScreen from '../screens/reel/ReelScrollScreen';
 import FollowingScreen from '../screens/dashboard/FollowingScreen';
+import UserProfileScreen from '../screens/dashboard/UserProfileScreen';
 
 export const authStack = [
   {
@@ -53,6 +54,10 @@ export const dashboardStack = [
   {
     name: 'FollowingScreen',
     component: FollowingScreen
+  },
+  {
+    name: 'UserProfileScreen',
+    component: UserProfileScreen
   }
 ];
 
