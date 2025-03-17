@@ -106,7 +106,7 @@ const ReelListTab: FC<{
       }}
       removeClippedSubviews
       initialNumToRender={2}
-      onEndReachedThreshold={0.3}
+      onEndReachedThreshold={0.1}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
