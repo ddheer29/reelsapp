@@ -2,13 +2,13 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import CustomView from '../../components/global/CustomView'
 import CustomGradient from '../../components/global/CustomGradient'
-import GlobeFeed from '../../components/feed/GlobeFeed'
+import GlobalFeed from '../../components/feed/GlobalFeed'
 
 const HomeScreen = () => {
   return (
     <CustomView>
       <CustomGradient position='top' />
-      <GlobeFeed />
+      <GlobalFeed />
       <CustomGradient position='bottom' />
     </CustomView>
   )
