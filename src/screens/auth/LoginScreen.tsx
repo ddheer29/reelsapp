@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { FC } from 'react';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import Lottie from 'lottie-react-native';
 import Animation from '../../assets/animations/login.json';
@@ -9,14 +9,11 @@ import { Colors } from '../../constants/Colors';
 import CustomText from '../../components/global/CustomText';
 import { FONTS } from '../../constants/Fonts';
 import SocialButtonHorizontal from '../../components/global/SocialButtonHorizontal';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Google from '../../assets/icons/google.png';
+import Icon from 'react-native-vector-icons/Ionicons';
+import GoogleIcon from '../../assets/icons/google.png';
 import { useAppDispatch } from '../../redux/reduxHook';
 import { signInWithFacebook, signInWithGoogle } from '../../redux/SocialLogin';
-import { navigate, resetAndNavigate } from '../../utils/NavigationUtil';
-
-const LoginScreen = () => {
-
+const LoginScreen: FC = () => {
   const dispatch = useAppDispatch();
 
   return (
@@ -24,62 +21,53 @@ const LoginScreen = () => {
       <View style={styles.lottieContainer}>
         <Lottie source={Animation} autoPlay loop style={styles.lottie} />
       </View>
+
       <View style={styles.titleContainer}>
         <LinearGradient
-          colors={['rgba(0,0,0,0)', Colors.text, 'rgba(0,0,0,0)']}
+          colors={[`rgba(0,0,0,0)`, Colors.text, `rgba(0,0,0,0)`]}
           style={styles.linearGradient}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
         />
-        <CustomText variant="h2">
+        <CustomText variant="h2" fontFamily={FONTS.Reelz}>
           Reelzzz
         </CustomText>
         <LinearGradient
-          colors={['rgba(0,0,0,0)', Colors.text, 'rgba(0,0,0,0)']}
+          colors={[`rgba(0,0,0,0)`, Colors.text, `rgba(0,0,0,0)`]}
           style={styles.linearGradient}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
         />
       </View>
 
-      <CustomText variant="h6" style={styles.tagline}>
+      <CustomText variant="h6" fontFamily={FONTS.Medium} style={styles.tagline}>
         Rewarding Every Moment for Creators and Viewers.
       </CustomText>
 
       <SocialButtonHorizontal
-        icon={<Icon name="facebook" size={20} color={Colors.text} />}
+        icon={<Icon name="logo-facebook" size={20} color={Colors.text} />}
         onPress={async () => await dispatch(signInWithFacebook())}
         text="Continue with Facebook"
         textColor="#fff"
         backgroundColor={Colors.fbColor}
       />
+
       <SocialButtonHorizontal
-        icon={<Image source={Google} style={styles.gimg} />}
+        icon={<Image source={GoogleIcon} style={styles.gimg} />}
         onPress={async () => await dispatch(signInWithGoogle())}
         text="Continue with Google"
         textColor="#000"
         backgroundColor={Colors.white}
       />
 
-      <View style={{ marginVertical: 20 }}>
-        <TouchableOpacity onPress={() => navigate('LoginEmail')}>
-          <CustomText variant="h6" style={{ color: Colors.text }}>
-            Login with Id and Password
-          </CustomText>
-        </TouchableOpacity>
-      </View>
-
       <TouchableOpacity style={styles.footerText}>
-        <CustomText variant="h8">
+        <CustomText variant="h8" fontFamily={FONTS.Medium}>
           Designed and developed by - Divyang Dheer
         </CustomText>
       </TouchableOpacity>
-
     </CustomSafeAreaView>
   );
 };
-
-export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -117,3 +105,4 @@ const styles = StyleSheet.create({
     bottom: 10,
   },
 });
+export default LoginScreen;

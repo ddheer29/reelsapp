@@ -1,15 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { View, Text, StyleSheet, Platform, Share } from 'react-native';
+import React, { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { screenHeight, screenWidth } from '../../utils/Scaling';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHook';
 import { useIsFocused } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import Loader from '../../assets/images/loader.jpg';
 import Video from 'react-native-video';
-import convertToProxyUrl from 'react-native-video-cache'
+import convertToProxyURL from 'react-native-video-cache';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { RFValue } from 'react-native-responsive-fontsize';
 import LottieView from 'lottie-react-native';
 import DoubleTapAnim from '../../assets/animations/heart.json';
 import ReelItem from './ReelItem';
@@ -28,7 +27,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
 
   const dispatch = useAppDispatch();
   const likedReels = useAppSelector(selectLikedReel);
-  const commentsCount = useAppSelector(selectComments);
+  const commentsCounts = useAppSelector(selectComments);
   const [paused, setPaused] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [videoLoaded, setVideoLoaded] = useState<boolean>(false);
@@ -39,70 +38,71 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
   const reelMeta = useMemo(() => {
     return {
       isLiked:
-        likedReels?.find((ritem: any) => ritem._id === item?._id)?.isLiked ??
+        likedReels?.find((ritem: any) => ritem.id === item._id)?.isLiked ??
         item?.isLiked,
       likesCount:
-        likedReels?.find((ritem: any) => ritem._id === item?._id)?.likesCount ??
-        item?.likesCount
-    }
-  }, [likedReels, item?._id])
+        likedReels?.find((ritem: any) => ritem.id === item._id)?.likesCount ??
+        item?.likesCount,
+    };
+  }, [likedReels, item?._id]);
 
   const commentMeta = useMemo(() => {
     return (
-      commentsCount?.find((ritem: any) => ritem.reelId === item?._id)?.commentsCount ?? item?.commentsCount
-    )
-  }, [commentsCount, item?._id])
+      commentsCounts?.find((ritem: any) => ritem.reelId === item._id)
+        ?.commentsCount ?? item?.commentsCount
+    );
+  }, [commentsCounts, item?._id]);
 
-  const handleLikedReel = async () => {
-    console.log('called like reel');
-    await dispatch(toggleLikeReel(item._id, reelMeta?.likesCount));
-  }
+  const handleLikeReel = async () => {
+    await dispatch(
+      toggleLikeReel(item._id, reelMeta?.likesCount, reelMeta?.isLiked),
+    );
+  };
 
-  const handleVideoLoad = () => {
-    setVideoLoaded(true);
-  }
+  const handleShareReel = () => {
+  };
 
   const handleTogglePlay = useCallback(() => {
     let currentState = !paused ? 'paused' : 'play';
     setIsPaused(!isPaused);
     setPaused(currentState);
     setTimeout(() => {
-      if (currentState === 'play') {
-        setPaused(null);
-      }
+      if (currentState === 'play') setPaused(null);
     }, 700);
-  }, [paused, isPaused])
+  }, [paused, isPaused]);
 
-  const handleDoubleTap = useCallback(() => {
+  const handleDoubleTapLike = useCallback(() => {
     setShowLikeAnim(true);
     if (!reelMeta?.isLiked) {
-      handleLikedReel();
+      handleLikeReel();
     }
     setTimeout(() => {
       setShowLikeAnim(false);
     }, 1200);
-  }, [reelMeta])
+  }, [reelMeta]);
 
   const singleTap = Gesture.Tap()
     .maxDuration(250)
     .onStart(() => {
       handleTogglePlay();
-    }).runOnJS(true);
+    })
+    .runOnJS(true);
 
   const doubleTap = Gesture.Tap()
     .maxDuration(250)
     .numberOfTaps(2)
     .onStart(() => {
-      handleDoubleTap();
-    }).runOnJS(true);
+      handleDoubleTapLike();
+    })
+    .runOnJS(true);
 
   useEffect(() => {
     setIsPaused(!isVisible);
-    if (isVisible) {
+    if (!isVisible) {
       setPaused(null);
       setVideoLoaded(false);
     }
-  }, [isVisible])
+  }, [isVisible]);
 
   useEffect(() => {
     if (!isFocused) {
@@ -111,162 +111,162 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
     if (isFocused && isVisible) {
       setIsPaused(false);
     }
-  }, [isFocused])
+  }, [isFocused]);
+
+  const handleVideoLoad = () => {
+    setVideoLoaded(true);
+  };
 
   return (
     <View style={styles.container}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GestureDetector gesture={Gesture.Exclusive(doubleTap)}>
+        <GestureDetector gesture={Gesture.Exclusive(doubleTap, singleTap)}>
           <View style={styles.videoContainer}>
-            {
-              !videoLoaded && (
-                <FastImage source={{ uri: item.thumbUri, priority: FastImage.priority.high }}
-                  style={styles.videoContainer}
-                  defaultSource={Loader}
-                  resizeMode='cover'
-                />
-              )
-            }
-            {
-              isVisible || preload ? (
-                <Video
-                  poster={item.thumbUri}
-                  posterResizeMode='cover'
-                  source={
-                    isVisible || preload
-                      ? { uri: convertToProxyUrl(item.videoUri) }
-                      : undefined
-                  }
-                  bufferConfig={{
-                    minBufferMs: 2500,
-                    maxBufferMs: 3000,
-                    bufferForPlaybackMs: 2500,
-                    bufferForPlaybackAfterRebufferMs: 2500
-                  }}
-                  ignoreSilentSwitch={'ignore'}
-                  playWhenInactive={false}
-                  playInBackground={false}
-                  useTextureView={false}
-                  controls={false}
-                  disableFocus={false}
-                  style={styles.videoContainer}
-                  paused={true}
-                  repeat={true}
-                  hideShutterView
-                  minLoadRetryCount={5}
-                  resizeMode='cover'
-                  shutterColor='transparent'
-                  onReadyForDisplay={handleVideoLoad}
-                />
-              ) : null
-            }
+            {!videoLoaded && (
+              <FastImage
+                source={{ uri: item.thumbUri, priority: FastImage.priority.high }}
+                style={styles.videoContainer}
+                defaultSource={Loader}
+                resizeMode="cover"
+              />
+            )}
+
+            {isVisible || preload ? (
+              <Video
+                poster={item.thumbUri}
+                posterResizeMode="cover"
+                source={
+                  isVisible || preload
+                    ? { uri: convertToProxyURL(item.videoUri) }
+                    : undefined
+                }
+                bufferConfig={{
+                  minBufferMs: 2500,
+                  maxBufferMs: 3000,
+                  bufferForPlaybackMs: 2500,
+                  bufferForPlaybackAfterRebufferMs: 2500,
+                }}
+                ignoreSilentSwitch={'ignore'}
+                playWhenInactive={false}
+                playInBackground={false}
+                useTextureView={false}
+                controls={false}
+                disableFocus={true}
+                style={styles.videoContainer}
+                paused={isPaused}
+                repeat={true}
+                hideShutterView
+                minLoadRetryCount={5}
+                resizeMode="cover"
+                shutterColor="transparent"
+                onReadyForDisplay={handleVideoLoad}
+              />
+            ) : null}
           </View>
         </GestureDetector>
       </GestureHandlerRootView>
-      {
-        showLikeAnim && (
-          <View style={styles.lottieContainer}>
-            <LottieView
-              source={DoubleTapAnim}
-              autoPlay
-              loop={false}
-              style={styles.lottie}
+
+      {showLikeAnim && (
+        <View style={styles.lottieContainer}>
+          <LottieView
+            style={styles.lottie}
+            source={DoubleTapAnim}
+            autoPlay
+            loop={false}
+          />
+        </View>
+      )}
+
+      {paused !== null && (
+        <View style={styles.playPauseButton}>
+          <View style={styles.shadow} pointerEvents="none">
+            <Icon
+              name={paused === 'paused' ? 'pause' : 'play-arrow'}
+              size={50}
+              color="white"
             />
           </View>
-        )
-      }
-      {
-        paused !== null && (
-          <View style={styles.playPauseButton}>
-            <View style={styles.shadow} pointerEvents='none'>
-              <Icon
-                name={paused === 'paused' ? 'pause' : 'play-arrow'}
-                size={RFValue(50)}
-                color={'white'}
-              />
-            </View>
-          </View>
-        )
-      }
+        </View>
+      )}
 
       <ReelItem
         user={item?.user}
-        description={item?.caption}
+        description={item.caption}
         likes={reelMeta?.likesCount || 0}
         comments={commentMeta}
         onLike={() => {
-          handleLikedReel();
+          handleLikeReel();
         }}
         onComment={() => {
           SheetManager.show('comment-sheet', {
             payload: {
               id: item?._id,
               user: item?.user,
-              commentsCount: item.commentsCount
-            }
+              commentsCount: item.commentsCount,
+            },
           });
         }}
-        onShare={() => { }}
         onLongPressLike={() => {
           SheetManager.show('like-sheet', {
             payload: {
+              entityId: item?._id,
               type: 'reel',
-              entityId: item?._id
-            }
+            },
           });
         }}
+        // onShare={handleShareReel}
         isLiked={reelMeta?.isLiked}
       />
     </View>
-  )
-}
+  );
+};
 
 const areEqual = (prevProps: VideoItemProps, nextProps: VideoItemProps) => {
   return (
     prevProps?.item?._id === nextProps?.item?._id &&
     prevProps?.isVisible === nextProps?.isVisible
-  )
-}
+  );
+};
 
-export default React.memo(VideoItem, areEqual);
+export default memo(VideoItem, areEqual);
 
 const styles = StyleSheet.create({
   container: {
     height: screenHeight,
     width: screenWidth,
-    flex: 1,
     flexGrow: 1,
-  },
-  videoContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: screenHeight,
-    aspectRatio: 9 / 16,
-    zIndex: -1,
     flex: 1,
   },
   playPauseButton: {
     position: 'absolute',
     top: '47%',
-    left: '44%',
     bottom: 0,
+    left: '44%',
     opacity: 0.7,
   },
   shadow: {
-    zIndex: -1
-  },
-  lottie: {
-    height: '100%',
-    width: '100%',
+    zIndex: -1,
   },
   lottieContainer: {
-    height: '100%',
     width: '100%',
+    height: '100%',
     position: 'absolute',
     justifyContent: 'center',
-    alignContent: 'center'
-  }
-})
+    alignItems: 'center',
+  },
+  lottie: {
+    width: '100%',
+    height: '100%',
+  },
+  videoContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    height: screenHeight,
+    aspectRatio: 9 / 16,
+    flex: 1,
+    zIndex: -1,
+  },
+});
