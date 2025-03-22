@@ -6,7 +6,6 @@ import HomeScreen from '../screens/dashboard/HomeScreen';
 import PickReelScreen from '../screens/reel/PickReelScreen';
 import BottomTab from './BottomTab';
 import FeedReelScrollScreen from '../screens/reel/FeedReelScrollScreen';
-import LoginEmail from '../screens/auth/LoginEmail';
 import ReelScrollScreen from '../screens/reel/ReelScrollScreen';
 import FollowingScreen from '../screens/dashboard/FollowingScreen';
 import UserProfileScreen from '../screens/dashboard/UserProfileScreen';
@@ -23,10 +22,6 @@ export const authStack = [
   {
     name: 'SplashScreen',
     component: SplashScreen,
-  },
-  {
-    name: 'LoginEmail',
-    component: LoginEmail,
   },
 ];
 

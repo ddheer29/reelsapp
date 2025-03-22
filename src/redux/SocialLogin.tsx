@@ -21,6 +21,7 @@ interface RegisterData {
 }
 
 const handleSignInSuccess = async (res: any, dispatch: any) => {
+  console.log("Hello9")
   token_storage.set('access_token', res.data.tokens.access_token);
   token_storage.set('refresh_token', res.data.tokens.refresh_token);
   await dispatch(setUser(res.data.user));
@@ -29,6 +30,7 @@ const handleSignInSuccess = async (res: any, dispatch: any) => {
 
 const handleSignInError = (error: any, data: RegisterData) => {
   console.log(error);
+  console.log("Hello7")
   if (error.response.status == 401) {
     navigate('RegisterScreen', {
       ...data,
@@ -40,18 +42,24 @@ const handleSignInError = (error: any, data: RegisterData) => {
 
 export const signInWithGoogle = () => async (dispatch: any) => {
   try {
+    console.log("Hello1")
     await GoogleSignin.hasPlayServices();
+    console.log("Hello2")
     await GoogleSignin.signOut();
+    console.log("Hello3")
     const { idToken, user } = await GoogleSignin.signIn();
+    console.log("Hello4", { idToken, user })
     await axios
       .post(LOGIN, {
         provider: 'google',
         id_token: idToken,
       })
       .then(async res => {
+        console.log("Hello5")
         await handleSignInSuccess(res, dispatch);
       })
       .catch((err: any) => {
+        console.log("Hello6")
         const errorData = {
           email: user.email,
           name: user.name,

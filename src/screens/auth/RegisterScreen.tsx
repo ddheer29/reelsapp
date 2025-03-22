@@ -8,7 +8,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import CustomText from '../../components/global/CustomText';
 import { useRoute } from '@react-navigation/native';
 import { useAppDispatch } from '../../redux/reduxHook';
-import { checkUserNameAvailability, register } from '../../redux/actions/userAction';
+import { checkUsernameAvailability, register } from '../../redux/actions/userAction';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -48,7 +48,7 @@ const RegisterScreen = () => {
   }, [item]);
 
   const checkUsername = async () => {
-    const res = await dispatch(checkUserNameAvailability(username));
+    const res = await dispatch(checkUsernameAvailability(username));
     setUsernameAvailable(res);
   };
 
@@ -124,7 +124,8 @@ const RegisterScreen = () => {
       !trimmedUsername ||
       !trimmedFullName ||
       !trimmedBio ||
-      !usernameAvailable
+      usernameAvailable === false ||
+      usernameAvailable === null
     ) {
       Alert.alert('All fields are required');
       setLoading(false);
@@ -223,13 +224,19 @@ const RegisterScreen = () => {
           returnKeyType='next'
           value={username}
           placeholderTextColor={Colors.border}
-          onChangeText={setUsername}
+          onChangeText={(text) => {
+            setUsername(text);
+            setUsernameAvailable(null);  // Reset availability check when text changes
+          }}
           onEndEditing={async () => {
-            await checkUsername();
+            if (username.trim().length > 0) {
+              await checkUsername();
+            }
           }}
           placeholder='Enter unique username'
           autoComplete='off'
         />
+
 
         <CustomText style={styles.label}>Full Name</CustomText>
         <TextInput
