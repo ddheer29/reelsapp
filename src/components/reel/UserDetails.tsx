@@ -8,6 +8,7 @@ import CustomText from '../global/CustomText';
 import { FONTS } from '../../constants/Fonts';
 import { selectFollowing } from '../../redux/reducers/followingSlice';
 import { toggleFollow } from '../../redux/actions/userAction';
+import { push } from '../../utils/NavigationUtil';
 
 interface UserDetailsProps {
   user: any;
@@ -32,7 +33,14 @@ const UserDetails: FC<UserDetailsProps> = React.memo(({ user }) => {
 
   return (
     <View>
-      <TouchableOpacity style={styles.flexRow}>
+      <TouchableOpacity
+        style={styles.flexRow}
+        onPress={() => {
+          push('UserProfileScreen', {
+            username: user.username,
+          });
+        }}
+      >
         <FastImage
           source={{ uri: user?.userImage, priority: FastImage.priority.high }}
           style={styles.img}
