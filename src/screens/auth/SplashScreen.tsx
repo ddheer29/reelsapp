@@ -1,4 +1,4 @@
-import { Alert, Animated, StyleSheet, View } from 'react-native';
+import { Alert, Animated, Linking, StyleSheet, View } from 'react-native';
 import React, { FC, useEffect, useState } from 'react';
 import { Colors } from '../../constants/Colors';
 import Logo from '../../assets/images/logo_t.png';
@@ -6,10 +6,12 @@ import CustomText from '../../components/global/CustomText';
 import { FONTS } from '../../constants/Fonts';
 import { token_storage } from '../../redux/storage';
 import { jwtDecode } from 'jwt-decode';
-import { resetAndNavigate } from '../../utils/NavigationUtil';
+import { navigate, resetAndNavigate } from '../../utils/NavigationUtil';
 import { refresh_tokens } from '../../redux/apiConfig';
 import { useAppDispatch } from '../../redux/reduxHook';
 import { refetchUser } from '../../redux/actions/userAction';
+import { extractTypeAndId } from '../../utils/dateUtils';
+import { getReelById } from '../../redux/actions/reelAction';
 
 interface DecodedToken {
   exp: number;
@@ -33,7 +35,7 @@ const SplashScreen: FC = () => {
         // if refresh roken is expired then we cant refresh access token, go back to login screen and login again
         resetAndNavigate('LoginScreen');
         Alert.alert('Session Expired, please login again');
-        return;
+        return false;
       }
 
       if (decodedAccessToken?.exp < currentTime) {
@@ -44,23 +46,72 @@ const SplashScreen: FC = () => {
         } catch (error) {
           console.log(error);
           Alert.alert('There was an error');
-          return;
+          return false;
         }
       }
 
-      // if none of the token is expired and everthing is fine then we navigate to bottom tab
       resetAndNavigate('BottomTab');
+      return true;
+    }
+    resetAndNavigate('LoginScreen');
+    return false;
+  }
+
+  const handleDeeplinking = async (event: any, deepLinkType: string) => {
+    const tokenValid = await tokenCheck()
+    if (!tokenValid) {
       return;
     }
-    // if no access token found then we navigate to login screen
-    resetAndNavigate('LoginScreen');
+    const { url } = event;
+    if (!url) {
+      handleNoUrlCase(deepLinkType);
+      return;
+    }
+
+    const { type, id } = extractTypeAndId(url);
+
+    switch (type) {
+      case 'reel':
+        await dispatch(getReelById(id, deepLinkType));
+        break;
+
+      case 'user':
+        handleUserCase(deepLinkType, id);
+        break;
+
+      default:
+        handleDefaultCase(deepLinkType);
+        break;
+    }
+  }
+
+  const handleNoUrlCase = (deepLinkType: string) => {
+    if (deepLinkType !== 'RESUME') {
+      resetAndNavigate('BottomTab');
+    }
+  }
+
+  const handleUserCase = (deepLinkType: string, id: string) => {
+    if (deepLinkType !== 'RESUME') {
+      resetAndNavigate('BottomTab');
+    }
+    navigate('UserProfileScreen', { usernae: id });
+  }
+
+  const handleDefaultCase = (deepLinkType: string) => {
+    if (deepLinkType !== 'RESUME') {
+      resetAndNavigate('BottomTab');
+    }
   }
 
   useEffect(() => {
-    async function deeplinks() {
-      await tokenCheck();
-    }
-    deeplinks();
+    Linking.getInitialURL().then((url) => {
+      handleDeeplinking({ url }, 'CLOSE')
+    })
+    // when the app is opened
+    Linking.addEventListener('url', (event) => {
+      handleDeeplinking(event, 'RESUME');
+    })
   });
 
   useEffect(() => {
