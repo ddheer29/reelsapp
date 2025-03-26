@@ -55,8 +55,7 @@ const UserProfileDetails: React.FC<{
   }, [followingUsers, user.id, user.isFollowing]);
 
   const handleShareProfile = () => {
-    const profileUrl = `${Platform.OS == 'android' ? 'https://dheer-reels-app.onrender.com' : 'reelzzz:/'
-      }/share/user/${user.username}`;
+    const profileUrl = `${Platform.OS == 'android' ? 'https://dheer-reels-app.onrender.com' : 'reelz:/'}/share/user/${user.username}`;
     const message = `Hey, Checkout this profile: ${profileUrl}`;
     Share.share({
       message: message,
