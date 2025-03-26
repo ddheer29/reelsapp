@@ -60,6 +60,18 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
   };
 
   const handleShareReel = () => {
+    const reelUrl = `${Platform.OS == 'android' ? 'https://dheer-reels-app.onrender.com' : 'reelz:/'
+      }/share/reel/${item._id}`;
+    const message = `Hey, Checkout this reel: ${reelUrl}`;
+    Share.share({
+      message: message,
+    })
+      .then(res => {
+        console.log('Share Result', res);
+      })
+      .catch(error => {
+        console.log('Share Error', error);
+      });
   };
 
   const handleTogglePlay = useCallback(() => {
@@ -214,7 +226,7 @@ const VideoItem: FC<VideoItemProps> = ({ item, isVisible, preload }) => {
             },
           });
         }}
-        // onShare={handleShareReel}
+        onShare={handleShareReel}
         isLiked={reelMeta?.isLiked}
       />
     </View>
