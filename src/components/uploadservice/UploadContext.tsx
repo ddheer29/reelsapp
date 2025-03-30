@@ -1,11 +1,12 @@
-import React, { createContext, FC, ReactNode, useContext, useEffect, useRef, useState } from "react";
-import { Alert, Animated, Easing, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useAppDispatch } from "../../redux/reduxHook";
-import { uploadFile } from "../../redux/actions/fileAction";
-import { createReel } from "../../redux/actions/reelAction";
-import { Colors } from "../../constants/Colors";
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { View, Text, StyleSheet, Animated, Easing, Image, TouchableOpacity, Platform, Alert } from 'react-native';
+import { useAppDispatch } from '../../redux/reduxHook';
+import { uploadFile } from '../../redux/actions/fileAction';
+import { createReel } from '../../redux/actions/reelAction';
+import { Colors } from '../../constants/Colors';
+import { navigate } from '../../utils/NavigationUtil';
 
-interface UploadContextProps {
+interface UploadContextType {
   isUpload: boolean;
   loadingMessage: string | null;
   uploading: boolean;
@@ -16,7 +17,7 @@ interface UploadContextProps {
   thumbnailUri: string;
 }
 
-const defaultContext: UploadContextProps = {
+const defaultContext: UploadContextType = {
   isUpload: false,
   loadingMessage: null,
   uploading: false,
@@ -27,7 +28,7 @@ const defaultContext: UploadContextProps = {
   thumbnailUri: '',
 }
 
-const UploadContext = createContext<UploadContextProps>(defaultContext);
+const UploadContext = createContext<UploadContextType>(defaultContext);
 
 export const UploadProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
@@ -40,42 +41,59 @@ export const UploadProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const dispatch = useAppDispatch();
 
-  const startUpload = async (thumb_uri: string, file_uri: string, caption: string) => {
-    Animated.timing(uploadAnimation, {
-      toValue: 1,
-      duration: 500,
-      easing: Easing.inOut(Easing.ease),
-      useNativeDriver: true,
-    }).start();
-    setUploadProgress(0);
-    setThumbnailUri(thumb_uri);
-    setUploading(true);
-    setLoadingMessage('Uploading Thumbnail...🚀');
-    showUpload(true);
-
-    const thumbnailResponse = await dispatch(uploadFile(thumb_uri, 'reel_thumbnail'));
-    setUploadProgress(30);
-    setLoadingMessage('Uploading Video...🗂️');
-    const videoResponse = await dispatch(uploadFile(file_uri, 'reel_video'));
-    setUploadProgress(70);
-    setLoadingMessage('Finishing Video...✨');
-    const data = {
-      videoUri: videoResponse,
-      thumbUri: thumbnailResponse,
-      caption,
-    }
-    await dispatch(createReel(data));
-    setUploading(false);
-    setUploadProgress(100);
-    await setTimeout(() => {
+  const startUpload = async (
+    thumb_uri: string,
+    file_uri: string,
+    caption: string,
+  ) => {
+    try {
       Animated.timing(uploadAnimation, {
-        toValue: 0,
+        toValue: 1,
         duration: 500,
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }).start();
-    }, 5000);
-  }
+      setUploadProgress(0);
+      setThumbnailUri(thumb_uri);
+      setUploading(true);
+      setLoadingMessage('Uploading Thumbnail...🚀');
+      showUpload(true);
+
+      const thumbnailResponse = await dispatch(
+        uploadFile(thumb_uri, 'reel_thumbnail'),
+      );
+      if (!thumbnailResponse) {
+        throw new Error('There was an upload error');
+      }
+      setUploadProgress(30);
+      setLoadingMessage('Uploading Video...🎞️');
+      const videoResponse = await dispatch(uploadFile(file_uri, 'reel_video'));
+      if (!videoResponse) {
+        throw new Error('There was an upload error');
+      }
+      setUploadProgress(70);
+      setLoadingMessage('Finishing Upload...✨');
+      const data = {
+        videoUri: videoResponse,
+        thumbUri: thumbnailResponse,
+        caption: caption,
+      };
+      await dispatch(createReel(data));
+      setUploading(false);
+      setUploadProgress(100);
+      await setTimeout(() => {
+        Animated.timing(uploadAnimation, {
+          toValue: 0,
+          duration: 500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }).start(() => showUpload(false));
+      }, 5000);
+    } catch (error) {
+      console.log(error)
+      showUpload(false);
+    }
+  };
 
   return (
     <UploadContext.Provider value={{
@@ -98,9 +116,8 @@ export const UploadProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
 export const useUpload = () => useContext(UploadContext);
 
-const UploadProgress: FC = () => {
-
-  const { isUpload, loadingMessage, startUpload, uploadAnimation, thumbnailUri, uploadProgress, uploading, showUpload } = useUpload();
+const UploadProgress: React.FC = () => {
+  const { isUpload, uploading, loadingMessage, uploadAnimation, uploadProgress, showUpload, thumbnailUri } = useUpload();
 
   useEffect(() => {
     if (!isUpload) {
@@ -111,7 +128,7 @@ const UploadProgress: FC = () => {
         useNativeDriver: true,
       }).start();
     }
-  }, []);
+  }, [isUpload]);
 
   if (!isUpload) {
     return null;
@@ -128,41 +145,36 @@ const UploadProgress: FC = () => {
         style={styles.content}
         disabled={uploading}
         onPress={() => {
-          uploading ? Alert.alert('Chill bro!, Its uploading') : null;
-        }}
-      >
+          uploading ? Alert.alert('Chill Bro!, Uploading') : null;
+        }}>
         <Image
           source={{ uri: thumbnailUri }}
-          style={{ width: 40, height: 40, borderRadius: 4, marginRight: 10 }}
+          style={styles.thumbnail}
         />
         <View style={styles.textContainer}>
           <Text style={styles.toastText}>
-            {uploading ? loadingMessage : 'Upload Complete!'}
+            {uploading ? `${loadingMessage}` : 'Upload Completed'}
           </Text>
           {
             !uploading && (
               <TouchableOpacity
-                onPress={() => showUpload(false)}
-              >
-                <Text style={styles.viewText}>
-                  View
-                </Text>
-
+                onPress={() => {
+                  navigate('Profile');
+                  showUpload(false);
+                }}>
+                <Text style={styles.viewText}>View</Text>
               </TouchableOpacity>
-            )
-          }
+            )}
         </View>
       </TouchableOpacity>
-      {
-        uploading && (
-          <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBar, { width: `${uploadProgress}%` }]} />
-          </View>
-        )
-      }
+      {uploading && (
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${uploadProgress}%` }]} />
+        </View>
+      )}
     </Animated.View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   toast: {
@@ -178,9 +190,27 @@ const styles = StyleSheet.create({
     borderWidth: 0.6,
     borderColor: Colors.border,
   },
-  progressBar: {
-    height: '100%',
-    backgroundColor: Colors.theme,
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+    marginRight: 10,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  viewText: {
+    color: 'white',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
   progressBarContainer: {
     height: 4,
@@ -190,20 +220,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginTop: 10,
   },
-  textContainer: {
-    flex: 1,
+  progressBar: {
+    height: '100%',
+    backgroundColor: Colors.theme,
   },
-  toastText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  viewText: {
-    color: '#fff',
-    fontSize: 14,
-    textDecorationLine: 'underline',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  }
-})
+});

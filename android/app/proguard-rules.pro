@@ -8,3 +8,8 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+# Keep SLF4J classes
+-keep class org.slf4j.** { *; }
+
+# Keep VideoCache classes
+-keep class com.danikula.videocache.** { *; }

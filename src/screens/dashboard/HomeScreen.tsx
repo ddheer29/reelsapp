@@ -3,14 +3,13 @@ import React from 'react'
 import CustomView from '../../components/global/CustomView'
 import CustomGradient from '../../components/global/CustomGradient'
 import GlobalFeed from '../../components/feed/GlobalFeed'
+import CustomSafeAreaView from '../../components/global/CustomSafeAreaView'
 
 const HomeScreen = () => {
   return (
-    <CustomView>
-      <CustomGradient position='top' />
+    <CustomSafeAreaView>
       <GlobalFeed />
-      <CustomGradient position='bottom' />
-    </CustomView>
+    </CustomSafeAreaView>
   )
 }
 

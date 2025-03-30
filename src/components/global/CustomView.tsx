@@ -7,7 +7,7 @@ interface CustomViewProps {
   style?: ViewStyle;
 }
 
-const CustomView:FC<CustomViewProps> = ({children, style}) => {
+const CustomView: FC<CustomViewProps> = ({ children, style }) => {
   return (
     <View style={[styles.container, style]}>{children}</View>
   );

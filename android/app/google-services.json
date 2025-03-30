@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "223297775713",
+    "project_id": "reels-820f7",
+    "storage_bucket": "reels-820f7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223297775713:android:f01195a8797cbf499f6220",
+        "android_client_info": {
+          "package_name": "com.dheer_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiw3fIDbmi2g0mkjlM7BlZgQibwJ8cZJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -118,37 +118,32 @@ const GlobalFeed = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GestureDetector gesture={Gesture.Simultaneous(pan, pinch)}>
-        <ImageBackground
-          source={GlobalBg}
-          style={{ flex: 1, zIndex: -1 }}
-          imageStyle={{ resizeMode: 'cover' }}>
-          <Animated.View style={[styles.container, animatedStyle]}>
-            <StatsContainer />
-            <View style={styles.gridContainer}>
-              {loading ? (
-                <FlatList
-                  data={Array.from({ length: 16 })}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  numColumns={4}
-                  pinchGestureEnabled
-                  scrollEnabled={false}
-                  contentContainerStyle={styles.flatlistContainer}
-                />
-              ) : (
-                <FlatList
-                  data={data}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  numColumns={4}
-                  pinchGestureEnabled
-                  scrollEnabled={false}
-                  contentContainerStyle={styles.flatlistContainer}
-                />
-              )}
-            </View>
-          </Animated.View>
-        </ImageBackground>
+        <Animated.View style={[styles.container, animatedStyle]}>
+          <StatsContainer />
+          <View style={styles.gridContainer}>
+            {loading ? (
+              <FlatList
+                data={Array.from({ length: 16 })}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={4}
+                pinchGestureEnabled
+                scrollEnabled={false}
+                contentContainerStyle={styles.flatlistContainer}
+              />
+            ) : (
+              <FlatList
+                data={data}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={4}
+                pinchGestureEnabled
+                scrollEnabled={false}
+                contentContainerStyle={styles.flatlistContainer}
+              />
+            )}
+          </View>
+        </Animated.View>
       </GestureDetector>
     </GestureHandlerRootView>
   );

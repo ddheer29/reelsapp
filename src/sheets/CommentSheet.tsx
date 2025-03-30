@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, Keyboard, Platform, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, Keyboard, Platform, StyleSheet, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ActionSheet, { SheetManager, SheetProps } from 'react-native-actions-sheet'
 import { screenHeight } from '../utils/Scaling'
@@ -8,13 +8,12 @@ import { FONTS } from '../constants/Fonts'
 import { useAppDispatch, useAppSelector } from '../redux/reduxHook'
 import { selectUser } from '../redux/reducers/userSlice'
 import { getSearchUsers } from '../redux/actions/userAction'
-import { s } from 'react-native-size-matters'
-import { getComments, postComment } from '../redux/actions/commentAction'
+import { getComments, postComment, postReply } from '../redux/actions/commentAction';
 import UserItem from '../components/global/UserItem'
 import CommentItem from '../components/comment/CommentItem'
 import CommentInput from '../components/comment/CommentInput'
 
-const CommentSheet = (props: SheetProps<"comment-sheet">) => {
+const CommentSheet = (props: SheetProps<'comment-sheet'>) => {
   const flatListRef = useRef<FlatList>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
@@ -27,10 +26,10 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
   const [replyCommentId, setReplyCommentId] = useState<string | number | null>(null);
   const [commentData, setCommentData] = useState<any[]>([]);
   const [mentionSearchWord, setMentionSearchWord] = useState<string | null>(null);
-  const [confirmMention, setConfirmMention] = useState<any | null>(false);
+  const [confirmMention, setConfirmMention] = useState<any | null>(null);
 
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   }
 
   const scrollToComment = (index: number, childIndex: number = 0) => {
@@ -40,51 +39,81 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
     }
   }
 
-  const removeDuplicate = (data: any) => {
-    const uniqueData = new Map();
-    data?.forEach((item: any) => {
-      if (!uniqueData.has(item._id)) {
-        uniqueData.set(item._id, item);
+  const removeDuplicates = (data: any) => {
+    const uniqueDataMap = new Map();
+    data.forEach((item: any) => {
+      if (!uniqueDataMap.has(item._id)) {
+        uniqueDataMap.set(item._id, item);
       }
-    }
-    );
-    return Array.from(uniqueData.values());
-  }
+    });
+    return Array.from(uniqueDataMap.values());
+  };
 
   const fetchSearchUserData = async () => {
     setSearchUserLoading(true);
-    const searchUserData = await dispatch(getSearchUsers(mentionSearchWord || ''));
-    setFilterData(searchUserData);
+    const searchUserData = await dispatch(
+      getSearchUsers(mentionSearchWord || ''),
+    );
     setSearchUserLoading(false);
-  }
+    setFilterData(searchUserData);
+  };
+
 
   const fetchComments = async (scrollOffset: number) => {
     setLoading(true);
-    const newData = await dispatch(getComments(props.payload?.id || '', scrollOffset));
+    const newData = await dispatch(
+      getComments(props?.payload?.id || '', scrollOffset),
+    );
     setOffset(scrollOffset + 5);
     if (newData.length < 5) {
       setHasMore(false);
     }
-    setCommentData(removeDuplicate([...commentData, ...newData]));
+
+    setCommentData(removeDuplicates([...commentData, ...newData]));
     setLoading(false);
   }
 
   const handleReplyComment = async (data: any) => {
+    const commentPostData = {
+      reelId: props.payload?.id,
+      commentId: replyCommentId,
+      ...(data?.hasGif ? { gifUrl: data?.gifUrl } : { reply: data?.comment }),
+    };
+    const res = await dispatch(
+      postReply(commentPostData, props.payload?.commentsCount || 0),
+    );
 
-  }
+    if (res) {
+      const tempCommentIndex = commentData.findIndex(
+        comment => comment._id === replyCommentId,
+      );
+
+      // Replace the temporary comment with the actual comment
+      if (tempCommentIndex !== -1) {
+        commentData[tempCommentIndex].repliesCount =
+          commentData[tempCommentIndex].repliesCount + 1;
+        setCommentData([...commentData]);
+      }
+    }
+    setReplyTo(null);
+    setReplyCommentId(null);
+  };
+
   const handlePostComment = async (data: any) => {
     const newCommentId = commentData?.length + 1;
     const timestamp = new Date().toISOString();
     const newComment = {
       _id: newCommentId,
       user: user,
-      content: data.comment || '',
+      comment: data.comment || '',
+      likes: 0,
       timestamp: timestamp,
-      hasGif: data?.hasGif || false,
+      hasGif: data.hasGif || false,
       isPosting: true,
-      girUrl: data?.hasGif ? data?.gifUrl : undefined,
-      replyTo: [],
-    }
+      gifUrl: data.hasGif ? data.gifUrl : undefined,
+      repliesCount: 0,
+      replies: [],
+    };
 
     commentData.unshift(newComment);
     setCommentData([...commentData]);
@@ -101,7 +130,7 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
     const tempCommentIndex = commentData.findIndex((comment) => comment._id === newCommentId);
 
-    // replace the temporary comment with the actual comment
+    // Replace the temporary comment with the actual comment
     if (tempCommentIndex !== -1) {
       commentData[tempCommentIndex] = commentReponse;
       commentData[tempCommentIndex].user = user;
@@ -110,7 +139,7 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
   }
 
-  const handleReply = (comment: Comment | SubReply, replyCommentId: string | number) => {
+  const handleReply = (comment: Comment | SubReply, replyCommentId: string | number,) => {
     setReplyTo(comment);
     setReplyCommentId(replyCommentId);
   }
@@ -125,7 +154,7 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
 
   return (
     <ActionSheet id={props.sheetId}
-      headerAlwaysVisible={true}
+      headerAlwaysVisible={false}
       isModal={true}
       onClose={() => SheetManager.hide(props.sheetId)}
       gestureEnabled={Platform.OS === 'ios'}
@@ -138,21 +167,22 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
       onSnapIndexChange={() => Keyboard.dismiss()}
     >
       <CustomText
-        variant='h7'
+        variant="h7"
         fontFamily={FONTS.SemiBold}
         style={styles.header}
       >
         Comments
       </CustomText>
+
       <View style={styles.divider} />
 
       {
         mentionSearchWord != null ? (
           <FlatList
             data={filterData || []}
-            keyboardShouldPersistTaps='always'
-            keyboardDismissMode='interactive'
-            keyExtractor={(item: User) => item._id.toString()}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="interactive"
+            keyExtractor={(item: User) => item._id?.toString()}
             renderItem={({ item }) => {
               return (
                 <UserItem user={item} onPress={() => {
@@ -177,16 +207,15 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
                         gap: 4,
                       }}
                     >
-                      <CustomText>
-                        {mentionSearchWord !== '' && `Searching for ${mentionSearchWord}`}
+                      <CustomText variant="h9" style={{ color: Colors.lightText }}>
+                        {mentionSearchWord != '' && `Searching for ${mentionSearchWord}`}
                       </CustomText>
                       <ActivityIndicator
                         size={"small"}
                         color={Colors.border}
                       />
                     </View>
-                  )
-                }
+                  )}
               </>
             )}
           />
@@ -208,10 +237,10 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
                 return null;
               }
               return (
-                <View>
-                  <ActivityIndicator style={styles.loading} size='small' color={Colors.border} />
+                <View style={{ marginTop: 20 }}>
+                  <ActivityIndicator color={Colors.white} size="small" />
                 </View>
-              )
+              );
             }}
             onEndReached={() => {
               if (hasMore) {
@@ -220,10 +249,10 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
             }}
             ListEmptyComponent={() => {
               if (loading) {
-                return null
+                return null;
               }
               return (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 40 }}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 40 }}>
                   <CustomText variant='h7'>No Comments yet!</CustomText>
                 </View>
               )
@@ -252,20 +281,20 @@ const CommentSheet = (props: SheetProps<"comment-sheet">) => {
         setMentionSearchWord={(value) => setMentionSearchWord(value)}
         confirmMention={confirmMention}
         replyTo={replyTo}
-        onPostComment={((data: any) => {
+        onPostComment={(data: any) => {
           if (replyCommentId) {
-            handleReplyComment(data)
+            handleReplyComment(data);
           } else {
-            handlePostComment(data)
+            handlePostComment(data);
           }
-        })}
+        }}
         clearReplyTo={() => {
           setReplyTo(null);
           setReplyCommentId(null);
         }}
       />
 
-    </ActionSheet>
+    </ActionSheet >
   )
 }
 
@@ -277,7 +306,7 @@ const styles = StyleSheet.create({
     height: 4,
     width: 40,
     top: 4,
-    borderColor: Colors.border
+    backgroundColor: Colors.border,
   },
   divider: {
     height: 0.2,
@@ -286,29 +315,10 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#121212',
-    height: screenHeight * 0.8
+    height: screenHeight * 0.8,
   },
   header: {
     alignSelf: 'center',
     marginVertical: 8,
   },
-  input: {
-    flex: 1,
-    paddingHorizontal: 2,
-    marginHorizontal: 10,
-    color: Colors.text,
-  },
-  loading: {
-    marginTop: 10,
-  },
-  inputContainer: {
-    backgroundColor: '#1f1e1e',
-    flexDirection: 'row',
-    borderRadius: 10,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 0,
-    paddingHorizontal: 8,
-    marginVertical: 15,
-    marginHorizontal: 10,
-    alignItems: 'center',
-  }
 })

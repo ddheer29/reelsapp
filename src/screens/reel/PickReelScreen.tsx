@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, FlatList, Image, Linking, PermissionsAndroid, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, View, FlatList, Image, PermissionsAndroid, Platform, Alert, TouchableOpacity, SafeAreaView, ActivityIndicator, Linking, } from 'react-native'
 import React, { FC, useEffect, useState } from 'react'
 import CustomView from '../../components/global/CustomView'
 import CustomHeader from '../../components/global/CustomHeader'
@@ -27,7 +27,7 @@ const useGallery = ({ pageSize = 30 }) => {
   const [isLoadingNextPage, setIsLoadingNextPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(true);
 
-  const loadingNextPagePictures = async () => {
+  const loadNextPagePictures = async () => {
     if (!hasNextPage) return;
     try {
       setIsLoadingNextPage(true);
@@ -40,110 +40,119 @@ const useGallery = ({ pageSize = 30 }) => {
           'fileSize',
           'filename',
           'fileExtension',
-          'imageSize'
-        ]
+          'imageSize',
+        ],
       });
 
-      const videoExtracted = videoData?.edges?.map((edge) => ({
+      const videoExtracted = videoData.edges.map(edge => ({
         uri: edge.node.image.uri,
         playableDuration: edge.node.image.playableDuration,
         filePath: edge.node.image.filepath,
         fileName: edge.node.image.filename,
-        extension: edge.node.image.extension
+        extension: edge.node.image.extension,
       }));
 
       setVideos(prev => [...prev, ...videoExtracted]);
       setNextCursor(videoData.page_info.end_cursor);
       setHasNextPage(videoData.page_info.has_next_page);
-
     } catch (error) {
-      console.log("🚀 ~ loadingNextPagePictures ~ error:", error);
-      Alert.alert('Error', 'Failed to load more videos');
+      console.error(error);
+      Alert.alert('Error', 'An error occurred while fetching videos.');
     } finally {
       setIsLoadingNextPage(false);
     }
-  }
-
-  const hasAndroidPermission = async () => {
-    if (Platform.Version as number >= 33) {
-      const statuses = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      ]);
-      return statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] === PermissionsAndroid.RESULTS.GRANTED
-        && statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] === PermissionsAndroid.RESULTS.GRANTED;
-    } else {
-      const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-      return status === PermissionsAndroid.RESULTS.GRANTED;
-    }
-  }
-
-  const fetchInitial = async () => {
-    const hasPermission = await hasAndroidPermission();
-    if (!hasPermission) {
-      setPermissionNotGranted(true);
-    } else {
-      setIsLoading(true);
-      await loadingNextPagePictures();
-      setIsLoading(false);
-    }
-  }
-
-  const fetchVideos = async () => {
-    setIsLoading(true);
-    await loadingNextPagePictures();
-    setIsLoading(false);
-  }
+  };
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      fetchInitial();
-    } else {
-      fetchVideos();
+    async function fetchVideos() {
+      setIsLoading(true);
+      await loadNextPagePictures();
+      setIsLoading(false);
     }
-  }, [])
+
+    const hasAndroidPermission = async () => {
+      // Perform your Android permission checks here
+      // Example:
+      if ((Platform.Version as number) >= 33) {
+        const statuses = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+        ]);
+        return (
+          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
+          PermissionsAndroid.RESULTS.GRANTED &&
+          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ===
+          PermissionsAndroid.RESULTS.GRANTED &&
+          statuses[PermissionsAndroid.PERMISSIONS.CAMERA] ===
+          PermissionsAndroid.RESULTS.GRANTED
+        );
+      } else {
+        const status = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        );
+        return status === PermissionsAndroid.RESULTS.GRANTED;
+      }
+    };
+    const fetchInitial = async () => {
+      const hasPermission = await hasAndroidPermission();
+      if (!hasPermission) {
+        setPermissionNotGranted(true);
+      } else {
+        setIsLoading(true);
+        await loadNextPagePictures();
+        setIsLoading(false);
+      }
+    };
+    // Skip permission check for iOS
+    if (Platform.OS === 'ios') {
+      fetchVideos();
+    } else {
+      fetchInitial();
+    }
+  }, []);
 
   return {
     videos,
-    loadingNextPagePictures,
+    loadNextPagePictures,
     isLoading,
     permissionNotGranted,
     isLoadingNextPage,
-    hasNextPage
-  }
-
-}
+    hasNextPage,
+  };
+};
 
 const PickReelScreen: FC = () => {
-
   const {
     videos,
-    loadingNextPagePictures,
+    loadNextPagePictures,
     isLoading,
     permissionNotGranted,
     isLoadingNextPage,
-    hasNextPage
+    hasNextPage,
   } = useGallery({ pageSize: 30 });
 
   const handleOpenSettings = () => {
     Linking.openSettings();
-  }
+  };
 
   const handleVideoSelect = async (data: any) => {
     const { uri } = data;
+
     if (Platform.OS === 'android') {
       createThumbnail({
         url: uri || '',
         timeStamp: 100,
-      }).then((response) => {
-        console.log(response);
-        navigate('UploadReelScreen', {
-          thumb_uri: response.path,
-          file_uri: uri
-        })
-      }).catch((err) => {
-        console.log("🚀 ~ .Error while generating thumbnail ~ err:", err)
       })
+        .then(response => {
+          console.log(response);
+          navigate('UploadReelScreen', {
+            thumb_uri: response.path,
+            file_uri: uri,
+          });
+        }).catch((err) => {
+          console.error('Thumbnail generation error', err);
+        });
       return;
     }
     const fileData = await CameraRoll.iosGetImageDataById(uri);
@@ -154,12 +163,12 @@ const PickReelScreen: FC = () => {
       console.log(response);
       navigate('UploadReelScreen', {
         thumb_uri: response.path,
-        file_uri: uri
-      })
+        file_uri: fileData?.node?.image?.filepath,
+      });
     }).catch((err) => {
-      console.log("🚀 ~ .Error while generating thumbnail ~ err:", err)
-    })
-  }
+      console.error('Thumbnail generation error', err);
+    });
+  };
 
   const renderItem = ({ item }: { item: VideoProp }) => {
     return (
@@ -169,46 +178,48 @@ const PickReelScreen: FC = () => {
           style={styles.thumbnail}
         />
         <CustomText
-          variant='h8'
+          variant="h8"
           style={styles.time}
           fontFamily={FONTS.SemiBold}
         >
           {convertDurationToMMSS(item?.playableDuration)}
         </CustomText>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const renderFooter = () => {
     if (!isLoadingNextPage) return null;
     return (
-      <ActivityIndicator size='small' color={Colors.white} />
+      <ActivityIndicator size="small" color={Colors.theme} />
     )
-  }
+  };
 
   return (
     <CustomView>
       <SafeAreaView style={styles.margin}>
-        <CustomHeader title='New Reel' />
+        <CustomHeader title="New Reel" />
       </SafeAreaView>
-      <View>
+      <View style={styles.pad}>
         <PickerReelButton />
         <View style={styles.flexRow}>
-          <CustomText>
+          <CustomText variant="h6" fontFamily={FONTS.Medium}>
             Recent
           </CustomText>
-          <Icon name='chevron-down' size={RFValue(20)} color={Colors.white} />
+          <Icon name="chevron-down" size={RFValue(20)} color={Colors.white} />
         </View>
       </View>
 
       {permissionNotGranted ? (
         <View style={styles.permissionDeniedContainer}>
-          <CustomText variant='h6' style={{ textAlign: 'center' }}>
-            We need permission to access your gallery, please open settings and grant permission
+          <CustomText variant="h6" fontFamily={FONTS.Medium}>
+            We need permission to access your gallery.
           </CustomText>
           <TouchableOpacity onPress={handleOpenSettings}>
             <CustomText
-              style={styles.permissionDeniedButton}
+              variant="h6"
+              fontFamily={FONTS.Medium}
+              style={styles.permissionButton}
             >
               Open Settings
             </CustomText>
@@ -217,14 +228,14 @@ const PickReelScreen: FC = () => {
       ) : (
         <>
           {
-            isLoading ? <ActivityIndicator size='small' color={Colors.white} />
+            isLoading ? <ActivityIndicator size="small" color={Colors.white} />
               : (
                 <FlatList
                   data={videos}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={renderItem}
                   numColumns={3}
-                  onEndReached={loadingNextPagePictures}
+                  onEndReached={loadNextPagePictures}
                   onEndReachedThreshold={0.5}
                   ListFooterComponent={renderFooter}
                 />
@@ -232,10 +243,9 @@ const PickReelScreen: FC = () => {
           }
         </>
       )}
-
     </CustomView>
-  )
-}
+  );
+};
 
 export default PickReelScreen
 
@@ -250,22 +260,31 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   flexRow: {
+    alignItems: 'center',
     flexDirection: 'row',
+    gap: 6,
     margin: 8,
     marginTop: 20,
-    alignItems: 'center',
-    gap: 6,
+  },
+  pad: {
+    padding: 8,
   },
   permissionDeniedContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    alignContent: 'center',
   },
-  permissionDeniedButton: {
-    marginTop: 15,
-    color: Colors.theme
+  permissionButton: {
+    marginTop: 16,
+    color: Colors.theme,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
   thumbnail: {
     width: '100%',

@@ -97,7 +97,7 @@ const ProfileScreen = () => {
           })
         }
       </Tabs.Container>
-      <CustomGradient position='bottom' />
+      {/* <CustomGradient position='bottom' /> */}
     </CustomSafeAreaView>
   )
 }
