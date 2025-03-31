@@ -8,17 +8,17 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import React, { FC, useEffect, useState } from 'react';
-import { useRoute } from '@react-navigation/native';
+import React, {FC, useEffect, useState} from 'react';
+import {useRoute} from '@react-navigation/native';
 import CustomSafeAreaView from '../../components/global/CustomSafeAreaView';
 import CustomHeader from '../../components/global/CustomHeader';
-import { useAppDispatch } from '../../redux/reduxHook';
-import { Colors } from '../../constants/Colors';
-import { screenHeight } from '../../utils/Scaling';
+import {useAppDispatch} from '../../redux/reduxHook';
+import {Colors} from '../../constants/Colors';
+import {screenHeight} from '../../utils/Scaling';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { RFValue } from 'react-native-responsive-fontsize';
+import {RFValue} from 'react-native-responsive-fontsize';
 import UserItem from '../../components/global/UserItem';
-import { getFollowOrFollowingUsers } from '../../redux/actions/userAction';
+import {getFollowOrFollowingUsers} from '../../redux/actions/userAction';
 import CustomText from '../../components/global/CustomText';
 
 interface paramData {
@@ -76,7 +76,7 @@ const FollowingScreen: FC = () => {
 
   return (
     <CustomSafeAreaView>
-      <CustomHeader title={paramData.type} onInfoPress={() => { }} />
+      <CustomHeader title={paramData.type} onInfoPress={() => {}} />
       <View style={styles.inputContainer}>
         <Icon name={'magnify'} size={RFValue(14)} color={Colors.border} />
         <TextInput
@@ -119,9 +119,9 @@ const FollowingScreen: FC = () => {
             );
           }}
           data={users}
-          style={{ height: '100%' }}
+          style={{height: '100%'}}
           keyExtractor={(item: User) => item._id?.toString()}
-          renderItem={({ item }) => <UserItem user={item} />}
+          renderItem={({item}) => <UserItem user={item} />}
           ListFooterComponent={
             loading && offset > 0 ? (
               <ActivityIndicator size="small" color={Colors.text} />

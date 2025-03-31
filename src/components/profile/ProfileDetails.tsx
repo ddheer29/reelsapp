@@ -43,8 +43,15 @@ const ProfileDetails: FC<{ user: User }> = ({ user }) => {
   const handleEditProfile = () => { }
 
   const handleLogout = () => {
-    dispatch(Logout())
-  }
+    Alert.alert(
+      "Confirm Logout", 
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Logout", onPress: () => dispatch(Logout()) }
+      ]
+    );
+  };
 
   return (
     <View style={{ backgroundColor: Colors.background }}>
@@ -60,7 +67,7 @@ const ProfileDetails: FC<{ user: User }> = ({ user }) => {
               count={user?.followersCount}
               label='Followers'
               onPress={() => push('FollowingScreen', {
-                user: user?._id,
+                user: user?.id,
                 type: 'Followers'
               })}
             />
@@ -68,7 +75,7 @@ const ProfileDetails: FC<{ user: User }> = ({ user }) => {
               count={user?.followingCount}
               label='Following'
               onPress={() => push('FollowingScreen', {
-                user: user?._id,
+                user: user?.id,
                 type: 'Following'
               })}
             />
