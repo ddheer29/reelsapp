@@ -39,15 +39,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 10,
-    marginBottom: 18
+    paddingHorizontal: 12
   },
   btn: {
-    backgroundColor: '#666',
+    backgroundColor: '#1c1b1b',
     padding: 8,
     borderRadius: 10,
     width: '48%',
     justifyContent: 'center',
-    alignItems: 'center'
-  }
-})
+    alignItems: 'center',
+  },
+});
